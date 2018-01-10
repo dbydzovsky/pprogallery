@@ -33,7 +33,6 @@ private fun validateUpdatePassword(dto: UpdateUserPasswordDto) {
 }
 
 private fun validateReport(dto: SubmitReportDto) {
-    if (dto.author == "" || dto.reason == "") {
-
-    }
+    if (dto.author == "" || dto.reason == "")
+        throw IncompleteSubmitedDtoException("Error while submitting report. You have not specified all required parameters.")
 }

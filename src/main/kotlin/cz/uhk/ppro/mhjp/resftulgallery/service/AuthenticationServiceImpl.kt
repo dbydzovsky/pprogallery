@@ -32,7 +32,7 @@ class AuthenticationServiceImpl (
         val (username, password) = try {
             credentials.split(":")
         } catch (e: IndexOutOfBoundsException) {
-            throw IncorrectAuthHeaderFormatException("error during token generation. Authorization header has incorrect format.")
+            throw IncorrectAuthHeaderFormatException("Error during token generation. Authorization header has incorrect format.")
         }
 
         val user = userRepository.getOneByUsername(username, User::class.java)
