@@ -19,18 +19,20 @@ class UserServiceImpl(
 ) :  UserService {
 
     override fun createEntity(newType: NewUserDto): ResponseEntity<ResponseDto> {
+        validateDto(newType)
         val existingUser = userRepository.getOneByUsername(newType.username, User::class.java)
         if (existingUser != null)
-            throw UsernameAlreadyExistsException("Error while creating new User. Username '${newType.username}' already exists.")
+            throw UsernameAlreadyExistsException("Error while creating new user. Username '${newType.username}' already exists.")
         if (newType.password != newType.repeatPassword)
-            throw PasswordsDontMatchException("Error while creating new User. Passwords don't match.")
+            throw PasswordsDontMatchException("Error while creating new user. Passwords don't match.")
         val newUser = User(
                 username = newType.username,
+                name = newType.username,
                 password = hashPassword(newType.password),
                 roles = roleRepository.findByName("ROLE_USER")
         )
         userRepository.save(newUser)
-        val dto = UserDataDto(newUser.username, newUser.dateJoined, newUser.enabled)
+        val dto = UserDataDto(newUser.username, newUser.name, newUser.dateJoined, newUser.enabled, newUser.private)
         addSelfObjectLink(dto)
         return buildSuccessfulResponse(200, "Successfully created new user '${newUser.username}'", dto)
     }
@@ -41,33 +43,37 @@ class UserServiceImpl(
         if (user.private) authorizationManager.authorize(authorization, idType)
         val dto = UserDataDto(
                 user.username,
+                user.name,
                 user.dateJoined,
-                user.enabled
+                user.enabled,
+                user.private
         )
         addSelfObjectLink(dto)
         return buildSuccessfulResponse(200, "Successfully retrieved user '$idType'.", dto)
     }
 
     override fun updateEntity(idType: String, updateType: UpdateUserDto, authorization: String, authorize: Boolean): ResponseEntity<ResponseDto> {
+        if (authorize) authorizationManager.authorize(authorization, idType)
         val editingUser = userRepository.getOneByUsername(idType, User::class.java) ?:
                 throw ContentNotFoundException("Error while editing user. User '$idType' not found.")
-        if (authorize) authorizationManager.authorize(authorization, editingUser.username)
+        validateDto(updateType)
         val existingUser = userRepository.getOneByUsername(updateType.username, User::class.java)
         if (existingUser != null) throw UsernameAlreadyExistsException("Error while editing user. Username '$idType' already exists.")
         val editedUser = editingUser.copy(
                 username = updateType.username,
+                name = updateType.name,
                 private = updateType.private
         )
         userRepository.save(editedUser)
-        val dto = UserDataDto(editedUser.username, editedUser.dateJoined, editedUser.enabled)
+        val dto = UserDataDto(editedUser.username, editedUser.name, editedUser.dateJoined, editedUser.enabled, editedUser.private)
         addSelfObjectLink(dto)
         return buildSuccessfulResponse(200, "Successfully edited user '$idType'", dto)
     }
 
     override fun deleteEntity(idType: String, authorization: String, authorize: Boolean): ResponseEntity<ResponseDto> {
+        if (authorize) authorizationManager.authorize(authorization, idType)
         val user = userRepository.getOneByUsername(idType, User::class.java) ?:
                 throw ContentNotFoundException("Error while deleting user. User '$idType' not found.")
-        if (authorize) authorizationManager.authorize(authorization, user.username)
         userRepository.delete(user)
         return buildSuccessfulResponse(204, "Successfully deleted user '$idType'")
     }
@@ -76,6 +82,7 @@ class UserServiceImpl(
         authorizationManager.authorize(authorization, username)
         val user = userRepository.getOneByUsername(username, User::class.java) ?:
                 throw ContentNotFoundException("Error while updating passwords. User '$username' not found.")
+        validateDto(updateUserPasswordDto)
         if (updateUserPasswordDto.newPassword != updateUserPasswordDto.repeatNewPassword)
             throw PasswordsDontMatchException("Error while updating passwords. New passwords don't match.")
         if (!matchPasswords(updateUserPasswordDto.newPassword, user.password))
@@ -91,14 +98,15 @@ class UserServiceImpl(
         authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR"))
         val user = userRepository.getOneByUsername(username, User::class.java) ?:
                 throw ContentNotFoundException("Error while reporting user. User '$username' not found.")
+        validateDto(report)
         // todo implement
         return buildSuccessfulResponse(204, "Successfully reported user '$username' for '${report.reason}'.")
     }
 
     override fun disableUser(username: String, authorization: String): ResponseEntity<ResponseDto> {
+        authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_MODERATOR"))
         val user = userRepository.getOneByUsername(username, User::class.java) ?:
                 throw ContentNotFoundException("Error while disabling user. User '$username' not found.")
-        authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_MODERATOR"))
         if (!user.enabled) throw NothingToDoException("Error while disabling user. User is already disabled.")
         val disabledUser = user.copy(enabled = false)
         userRepository.save(disabledUser)
@@ -106,9 +114,9 @@ class UserServiceImpl(
     }
 
     override fun enableUser(username: String, authorization: String): ResponseEntity<ResponseDto> {
+        authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_MODERATOR"))
         val user = userRepository.getOneByUsername(username, User::class.java) ?:
                 throw ContentNotFoundException("Error while enabling user. User '$username' not found.")
-        authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_MODERATOR"))
         if (user.enabled)
             throw NothingToDoException("Error while enabling user. User is already enabled.")
         val enabledUser = user.copy(enabled = true)
@@ -120,12 +128,12 @@ class UserServiceImpl(
         authorizationManager.authorize(authorization)
         val user = userRepository.getOneByUsername(username, User::class.java)
                 ?: throw ContentNotFoundException("Error while getting $username's roles. User '$username' not found.")
-        val roles = user.roles.map { RoleDto(it.toString()) }
+        val roles = user.roles.map { RoleDto(it.name) }
         return buildSuccessfulResponse(200, "User '$username' roles successfully retrieved.", *roles.toTypedArray())
     }
 
     override fun updateUserRoles(username: String, authorization: String, roles: List<String>): ResponseEntity<ResponseDto> {
-        authorizationManager.authorize(token = authorization)
+        authorizationManager.authorize(authorization)
         val user = userRepository.getOneByUsername(username, User::class.java)
                 ?: throw ContentNotFoundException("Error while changing $username's roles. User '$username' not found.")
         val rolesToBeAdded = roles.mapNotNull { roleRepository.getOneByName(it) }

@@ -1,5 +1,7 @@
 package cz.uhk.ppro.mhjp.resftulgallery.util
 
+class IncompleteSubmitedDtoException(msg: String, throwable: Throwable? = null) : RuntimeException(msg, throwable)
+
 class JwtMissingException(msg: String, throwable: Throwable? = null) : RuntimeException(msg, throwable)
 
 class NoAuthHeaderException(msg: String, throwable: Throwable? = null) : RuntimeException(msg, throwable)

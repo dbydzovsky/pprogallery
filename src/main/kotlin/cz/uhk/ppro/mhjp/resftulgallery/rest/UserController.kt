@@ -9,19 +9,20 @@ import cz.uhk.ppro.mhjp.resftulgallery.util.getOptionalTokenFromHeader
 import cz.uhk.ppro.mhjp.resftulgallery.util.getTokenFromHeader
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
 
 @RestController
 class UserController(private val userService: UserService) {
 
     @PostMapping("/signup")
-    fun createNewUser(newUserDto: NewUserDto) = userService.createEntity(newUserDto)
+    fun createNewUser(@RequestBody newUserDto: NewUserDto) = userService.createEntity(newUserDto)
 
     @GetMapping("/u/{username}")
     fun retrieveUser(@PathVariable("username") username: String, request: HttpServletRequest)
             = userService.readEntity(username, getOptionalTokenFromHeader(request))
 
     @PutMapping("/u/{username}")
-    fun updateUser(@PathVariable("username") username: String, updateUser: UpdateUserDto, request: HttpServletRequest)
+    fun updateUser(@PathVariable("username") username: String, @RequestBody updateUser: UpdateUserDto, request: HttpServletRequest)
             = userService.updateEntity(username, updateUser, getTokenFromHeader(request))
 
     @DeleteMapping("/u/{username}")
@@ -29,7 +30,7 @@ class UserController(private val userService: UserService) {
             = userService.deleteEntity(username, getTokenFromHeader(request))
 
     @PutMapping("/u/{username}/password")
-    fun updatePassword(@PathVariable("username") username: String, newPasswordDto: UpdateUserPasswordDto, request: HttpServletRequest)
+    fun updatePassword(@PathVariable("username") username: String, @RequestBody newPasswordDto: UpdateUserPasswordDto, request: HttpServletRequest)
             = userService.changePassword(username, newPasswordDto, getTokenFromHeader(request))
 
     @PutMapping("/u/{username}/disable")
@@ -41,7 +42,7 @@ class UserController(private val userService: UserService) {
             = userService.enableUser(username, getTokenFromHeader(request))
 
     @PostMapping("/u/{username}/report")
-    fun reportUser(@PathVariable("username") username: String, report: SubmitReportDto, request: HttpServletRequest)
+    fun reportUser(@PathVariable("username") username: String, @RequestBody report: SubmitReportDto, request: HttpServletRequest)
             = userService.reportUser(username, report, getTokenFromHeader(request))
 
     @GetMapping("/u/{username}/roles")

@@ -17,10 +17,11 @@ class DefaultResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     protected fun handleConflict(ex: RuntimeException, request: WebRequest): ResponseEntity<ResponseDto> {
         return buildErrorResponse(
                 when (ex) {
+                    is IncompleteSubmitedDtoException,
                     is IncorrectJwtFormatException,
                     is UnknownDtoException,
                     is NothingToDoException,
-                    is IncorrectAuthHeaderFormatException-> 400
+                    is IncorrectAuthHeaderFormatException -> 400
                     is JwtMissingException,
                     is OutdatedJwtException,
                     is TokenOwnerNotFoundException,
