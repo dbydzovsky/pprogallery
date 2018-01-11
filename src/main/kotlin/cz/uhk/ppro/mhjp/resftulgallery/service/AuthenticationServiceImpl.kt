@@ -5,7 +5,7 @@ import cz.uhk.ppro.mhjp.resftulgallery.domain.User
 import cz.uhk.ppro.mhjp.resftulgallery.dto.JwtDto
 import cz.uhk.ppro.mhjp.resftulgallery.dto.ResponseDto
 import cz.uhk.ppro.mhjp.resftulgallery.security.JwtHandler
-import cz.uhk.ppro.mhjp.resftulgallery.util.matchPasswords
+import cz.uhk.ppro.mhjp.resftulgallery.security.PasswordValidator
 import cz.uhk.ppro.mhjp.resftulgallery.util.*
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletRequest
 @Service
 class AuthenticationServiceImpl (
         private val userRepository: UserRepository,
-        private val jwtHandler: JwtHandler
+        private val jwtHandler: JwtHandler,
+        private val passwordValidator: PasswordValidator
 ) : AuthenticationService {
 
     override fun createJwtFromCredentials(request: HttpServletRequest): ResponseEntity<ResponseDto> {
@@ -38,7 +39,7 @@ class AuthenticationServiceImpl (
         val user = userRepository.getOneByUsername(username, User::class.java)
                 ?: throw ContentNotFoundException("Error during token generation. User '$username' not found.")
 
-        if (!matchPasswords(password, user.password))
+        if (!passwordValidator.matchPasswords(password, user.password))
             throw PasswordsDontMatchException("Error during token generation. Incorrect password")
 
         val (token, expires) = jwtHandler.generateToken(username)

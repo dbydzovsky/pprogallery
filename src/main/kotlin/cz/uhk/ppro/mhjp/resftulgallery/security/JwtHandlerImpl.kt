@@ -13,8 +13,8 @@ import java.util.*
 class JwtHandlerImpl : JwtHandler {
 
     companion object {
-        private val JWT_SECRET = "YQL1dgwvTcoNUVM72308Wd9XhuSItkBD7xRphfHRRWdGE3uP31eCunznm4pss0sK"
-        private val JWT_EXPIRATION = 3600000  //1 hour
+        private const val JWT_SECRET = "YQL1dgwvTcoNUVM72308Wd9XhuSItkBD7xRphfHRRWdGE3uP31eCunznm4pss0sK"
+        private const val JWT_EXPIRATION = 3600000  //1 hour
     }
 
     override fun generateToken(user: String): Pair<String, Int> {

@@ -4,6 +4,7 @@ import cz.uhk.ppro.mhjp.resftulgallery.dao.RoleRepository
 import cz.uhk.ppro.mhjp.resftulgallery.dao.UserRepository
 import cz.uhk.ppro.mhjp.resftulgallery.domain.Role
 import cz.uhk.ppro.mhjp.resftulgallery.domain.User
+import cz.uhk.ppro.mhjp.resftulgallery.security.PasswordValidator
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import javax.annotation.PostConstruct
@@ -12,7 +13,8 @@ import javax.annotation.PostConstruct
 @Transactional
 class DatabaseSeed(
         private val userRepository: UserRepository,
-        private val roleRepository: RoleRepository
+        private val roleRepository: RoleRepository,
+        private val passwordValidator: PasswordValidator
 ) {
 
     @PostConstruct
@@ -24,7 +26,8 @@ class DatabaseSeed(
         if (userRepository.findAll().isEmpty()) {
             userRepository.save(User(
                     username = "admin",
-                    password = hashPassword("pass"),
+                    name = "admin",
+                    password = passwordValidator.hashPassword("pass", false),
                     roles = roleRepository.findAll().toList()
             ))
         }

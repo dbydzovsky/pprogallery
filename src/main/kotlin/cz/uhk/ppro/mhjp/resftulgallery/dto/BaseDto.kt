@@ -12,13 +12,14 @@ open class ResponseDto(
         val responseCode: Int,
         val success: Boolean
 )
+
 class SuccessResponseDto(
         responseCode: Int,
-        val successMessage: String,
+        val message: String,
         val data: List<DataDtoBase>
 ) : ResponseDto(responseCode, true)
 
 class ErrorResponseDto(
         responseCode: Int,
-        val errorMessage: String
+        val message: String
 ) : ResponseDto(responseCode, false)

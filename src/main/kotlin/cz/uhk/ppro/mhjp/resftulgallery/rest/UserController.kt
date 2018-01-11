@@ -9,7 +9,6 @@ import cz.uhk.ppro.mhjp.resftulgallery.util.getOptionalTokenFromHeader
 import cz.uhk.ppro.mhjp.resftulgallery.util.getTokenFromHeader
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
 
 @RestController
 class UserController(private val userService: UserService) {

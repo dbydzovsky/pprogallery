@@ -13,14 +13,14 @@ fun buildErrorResponse(responseCode: Int, errorMessage: String, headers: List<Pa
                 .headers(httpHeaders)
                 .body(ErrorResponseDto(
                         responseCode = responseCode,
-                        errorMessage = errorMessage
+                        message = errorMessage
                 ))
     } else {
         ResponseEntity
                 .status(responseCode)
                 .body(ErrorResponseDto(
                         responseCode = responseCode,
-                        errorMessage = errorMessage
+                        message = errorMessage
                 ))
     }
 }
@@ -34,7 +34,7 @@ fun buildSuccessfulResponse(responseCode: Int, successMessage: String, vararg da
                 .headers(httpHeaders)
                 .body(SuccessResponseDto(
                         responseCode = responseCode,
-                        successMessage = successMessage,
+                        message = successMessage,
                         data = data.toList()
                 ))
     } else {
@@ -42,7 +42,7 @@ fun buildSuccessfulResponse(responseCode: Int, successMessage: String, vararg da
                 .status(responseCode)
                 .body(SuccessResponseDto(
                         responseCode = responseCode,
-                        successMessage = successMessage,
+                        message = successMessage,
                         data = data.toList()
                 ))
     }

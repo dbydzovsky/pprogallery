@@ -2,6 +2,8 @@ package cz.uhk.ppro.mhjp.resftulgallery.settings
 
 import cz.uhk.ppro.mhjp.resftulgallery.dto.ResponseDto
 import cz.uhk.ppro.mhjp.resftulgallery.util.*
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -13,8 +15,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 class DefaultResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
 
-    @ExceptionHandler(value = [(RuntimeException::class)])
-    protected fun handleConflict(ex: RuntimeException, request: WebRequest): ResponseEntity<ResponseDto> {
+    @ExceptionHandler(value = [(CustomException::class)])
+    protected fun handleCustomException(ex: CustomException, request: WebRequest): ResponseEntity<ResponseDto> {
         return buildErrorResponse(
                 when (ex) {
                     is IncompleteSubmitedDtoException,
@@ -28,14 +30,12 @@ class DefaultResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
                     is NoAuthHeaderException -> 401
                     is ForbiddenContentException -> 403
                     is ContentNotFoundException -> 404
-                    is HttpRequestMethodNotSupportedException -> 405
                     is UsernameAlreadyExistsException -> 409
                     is PasswordsDontMatchException,
-                    is NoContentException -> 422
-                    else -> 500
+                    is NoContentException,
+                    is WeakPasswordException -> 422
                 },
                 ex.message!!
         )
     }
-
 }
