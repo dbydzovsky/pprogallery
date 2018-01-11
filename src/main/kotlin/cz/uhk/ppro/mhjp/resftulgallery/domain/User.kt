@@ -4,7 +4,8 @@ import javax.persistence.*
 
 @Entity
 data class User(
-        @Id val username: String,
+        @Id
+        val username: String,
         val name: String,
         val password: String,
         val dateJoined: Long = System.currentTimeMillis(),

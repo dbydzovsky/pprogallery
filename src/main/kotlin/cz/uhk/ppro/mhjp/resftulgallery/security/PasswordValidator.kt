@@ -27,9 +27,9 @@ class PasswordValidator {
             val errors = mutableListOf<String>()
 
             if (pass.length < passLength) errors.add("Minimum length is $passLength symbols.")
-            if (passNumbers && pass.contains(Regex("[0-9]"))) errors.add("Use at least one number.")
+            if (passNumbers && !pass.contains(Regex("[0-9]"))) errors.add("Use at least one number.")
             if (passUppercase && pass == pass.toLowerCase()) errors.add("Use at least one uppercase symbol.")
-            if (passSpecialSymbols && pass.contains(Regex("[$specialSymbols]"))) errors.add("Use at least one special symbol.")
+            if (passSpecialSymbols && !pass.contains(Regex("[$specialSymbols]"))) errors.add("Use at least one special symbol.")
 
             if (errors.isNotEmpty()) throw WeakPasswordException("Your password is not strong enough. ${errors.joinToString(separator = " ")}")
         }

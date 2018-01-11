@@ -6,16 +6,17 @@ import javax.persistence.*
 data class Image(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        val imageId: Long = 0,
+        val id: Int = 0,
         val uuid: String,
         val description: String,
         val deleteHash: String,
         @Lob
         val imageBytes: ByteArray,
-        val dateUploaded: Long,
+        val dateUploaded: Long = System.currentTimeMillis(),
         val private: Boolean,
         val anonymous: Boolean = false,
         @ManyToOne
         val author: User? = null,
-        @ManyToMany(mappedBy = "likes") val likedByUsers: List<User> = emptyList()
+        @ManyToMany(mappedBy = "likedImages")
+        val likedByUsers: List<User> = emptyList()
 )

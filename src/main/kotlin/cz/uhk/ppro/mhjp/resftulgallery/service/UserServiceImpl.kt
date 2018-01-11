@@ -18,7 +18,8 @@ class UserServiceImpl(
         private val passwordValidator: PasswordValidator,
         private val dtoValidator: DtoValidator,
         private val responseBuilder: ResponseBuilder,
-        private val hateoasUtil: HateoasUtil
+        private val hateoasUtil: HateoasUtil,
+        private val dtoBuilder: DtoBuilder
 ) : UserService {
 
     override fun createEntity(newType: NewUserDto, authorization: String?): ResponseEntity<ResponseDto> {
@@ -35,18 +36,16 @@ class UserServiceImpl(
                 roles = roleRepository.findByName("ROLE_USER")
         )
         userRepository.save(newUser)
-        val dto = UserDataDto(newUser.username, newUser.name, newUser.dateJoined, newUser.enabled, newUser.private)
-        val dtoWithLinks = hateoasUtil.addSelfObjectLink(dto)
-        return responseBuilder.buildSuccessfulResponse(200, "Successfully created new user '${newUser.username}'", dtoWithLinks)
+        val dto = dtoBuilder.getUserDto(newUser)
+        return responseBuilder.buildSuccessfulResponse(200, "Successfully created new user '${newUser.username}'", dto)
     }
 
     override fun readEntity(idType: String, authorization: String?): ResponseEntity<ResponseDto> {
         val user = userRepository.getOneByUsername(idType) ?:
                 throw ContentNotFoundException("Error while retrieving user. User '$idType' not found.")
         if (user.private) authorizationManager.authorize(authorization, idType)
-        val dto = UserDataDto(user.username, user.name, user.dateJoined, user.enabled, user.private)
-        val dtoWithLinks = hateoasUtil.addSelfObjectLink(dto)
-        return responseBuilder.buildSuccessfulResponse(200, "Successfully retrieved user '$idType'.", dtoWithLinks)
+        val dto = dtoBuilder.getUserDto(user)
+        return responseBuilder.buildSuccessfulResponse(200, "Successfully retrieved user '$idType'.", dto)
     }
 
     override fun updateEntity(idType: String, updateType: UpdateUserDto, authorization: String?, authorize: Boolean): ResponseEntity<ResponseDto> {
@@ -62,9 +61,8 @@ class UserServiceImpl(
                 private = updateType.private
         )
         userRepository.save(editedUser)
-        val dto = UserDataDto(editedUser.username, editedUser.name, editedUser.dateJoined, editedUser.enabled, editedUser.private)
-        val dtoWithLinks = hateoasUtil.addSelfObjectLink(dto)
-        return responseBuilder.buildSuccessfulResponse(200, "Successfully edited user '$idType'.", dtoWithLinks)
+        val dto = dtoBuilder.getUserDto(editedUser)
+        return responseBuilder.buildSuccessfulResponse(200, "Successfully edited user '$idType'.", dto)
     }
 
     override fun deleteEntity(idType: String, authorization: String?, authorize: Boolean): ResponseEntity<ResponseDto> {

@@ -16,4 +16,6 @@ interface ImageService : CrudService<NewImageDto, UpdateImageDto, String> {
 
     fun like(uuid: String, authorization: String): ResponseEntity<ResponseDto>
 
+    fun getAll(): ResponseEntity<ResponseDto>
+
 }

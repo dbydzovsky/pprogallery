@@ -3,10 +3,7 @@ package cz.uhk.ppro.mhjp.resftulgallery.service
 import cz.uhk.ppro.mhjp.resftulgallery.dao.ImageRepository
 import cz.uhk.ppro.mhjp.resftulgallery.dao.UserRepository
 import cz.uhk.ppro.mhjp.resftulgallery.domain.Image
-import cz.uhk.ppro.mhjp.resftulgallery.dto.NewImageDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.ResponseDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.SubmitReportDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.UpdateImageDto
+import cz.uhk.ppro.mhjp.resftulgallery.dto.*
 import cz.uhk.ppro.mhjp.resftulgallery.security.AuthorizationManager
 import cz.uhk.ppro.mhjp.resftulgallery.security.JwtHandler
 import cz.uhk.ppro.mhjp.resftulgallery.util.*
@@ -32,9 +29,8 @@ class ImageServiceImpl(
             Image(
                     uuid = hashGenerator.hashIdToUuid(maxId),
                     description = newType.description,
-                    deleteHash = hashGenerator.hashIdToUuid(maxId),
+                    deleteHash = hashGenerator.hashIdToDeleteHash(maxId),
                     imageBytes = newType.imageBytes,
-                    dateUploaded = System.currentTimeMillis(),
                     anonymous = true,
                     private = newType.private
             )
@@ -44,7 +40,7 @@ class ImageServiceImpl(
             Image(
                     uuid = hashGenerator.hashIdToUuid(maxId),
                     description = newType.description,
-                    deleteHash = hashGenerator.hashIdToUuid(maxId),
+                    deleteHash = hashGenerator.hashIdToDeleteHash(maxId),
                     imageBytes = newType.imageBytes,
                     dateUploaded = System.currentTimeMillis(),
                     author = author,
@@ -100,5 +96,11 @@ class ImageServiceImpl(
 
     override fun like(uuid: String, authorization: String): ResponseEntity<ResponseDto> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getAll(): ResponseEntity<ResponseDto> {
+        val images = imageRepository.findAll()
+        val dtos = dtoBuilder.getImagesDtos(images, "image")
+        return responseBuilder.buildSuccessfulResponse(200, "asdf", *dtos.toTypedArray())
     }
 }
