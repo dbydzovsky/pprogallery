@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletRequest
 class AuthenticationServiceImpl (
         private val userRepository: UserRepository,
         private val jwtHandler: JwtHandler,
-        private val passwordValidator: PasswordValidator
+        private val passwordValidator: PasswordValidator,
+        private val responseBuilder: ResponseBuilder
 ) : AuthenticationService {
 
     override fun createJwtFromCredentials(request: HttpServletRequest): ResponseEntity<ResponseDto> {
@@ -44,7 +45,7 @@ class AuthenticationServiceImpl (
 
         val (token, expires) = jwtHandler.generateToken(username)
 
-        return buildSuccessfulResponse(200, "Token successfully generated.", JwtDto(token, expires))
+        return responseBuilder.buildSuccessfulResponse(200, "Token successfully generated.", JwtDto(token, expires))
 
     }
 

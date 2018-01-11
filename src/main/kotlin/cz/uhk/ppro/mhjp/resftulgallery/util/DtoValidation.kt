@@ -1,9 +1,6 @@
 package cz.uhk.ppro.mhjp.resftulgallery.util
 
-import cz.uhk.ppro.mhjp.resftulgallery.dto.NewUserDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.SubmitReportDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.UpdateUserDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.UpdateUserPasswordDto
+import cz.uhk.ppro.mhjp.resftulgallery.dto.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -16,6 +13,7 @@ class DtoValidation {
             is UpdateUserDto -> validateUpdateUser(dto)
             is UpdateUserPasswordDto -> validateUpdatePassword(dto)
             is SubmitReportDto -> validateReport(dto)
+            is NewImageDto -> validateNewImage(dto)
             else -> throw UnknownDtoException("Error while processing DTO. Unknown DTO.")
         }
 
@@ -23,21 +21,29 @@ class DtoValidation {
 
     private fun validateNewUser(dto: NewUserDto) {
         if (dto.username == "" || dto.password == "" || dto.repeatPassword == "")
-            throw IncompleteSubmitedDtoException("Error while creating new user. You have not specified all required parameters.")
+            throw IncompleteSubmittedDtoException("Error while creating new user. You have not specified all required parameters.")
     }
 
     private fun validateUpdateUser(dto: UpdateUserDto) {
         if (dto.username == "" || dto.name == "")
-            throw IncompleteSubmitedDtoException("Error while updating user. You have not specified all required parameters.")
+            throw IncompleteSubmittedDtoException("Error while updating user. You have not specified all required parameters.")
     }
 
     private fun validateUpdatePassword(dto: UpdateUserPasswordDto) {
         if (dto.oldPassword == "" || dto.newPassword == "" || dto.repeatNewPassword == "")
-            throw IncompleteSubmitedDtoException("Error while updating password. You have not specified all required parameters.")
+            throw IncompleteSubmittedDtoException("Error while updating password. You have not specified all required parameters.")
     }
 
     private fun validateReport(dto: SubmitReportDto) {
         if (dto.author == "" || dto.reason == "")
-            throw IncompleteSubmitedDtoException("Error while submitting report. You have not specified all required parameters.")
+            throw IncompleteSubmittedDtoException("Error while submitting report. You have not specified all required parameters.")
+    }
+
+    private fun validateNewImage(dto: NewImageDto) {
+        if (dto.imageBytes.isEmpty()) {
+            throw IncompleteSubmittedDtoException("Error while uploading image. Image has no content.")
+        }
+        if (dto.imageBytes.size > 10000000)
+            throw ImageSizeTooLargeException("Error while uploading image. Image is bigger than 10MB.")
     }
 }

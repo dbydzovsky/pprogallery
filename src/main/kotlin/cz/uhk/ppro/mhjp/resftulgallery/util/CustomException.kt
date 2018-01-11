@@ -2,7 +2,7 @@ package cz.uhk.ppro.mhjp.resftulgallery.util
 
 sealed class CustomException(msg: String, throwable: Throwable?) : RuntimeException(msg, throwable)
 
-class IncompleteSubmitedDtoException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
+class IncompleteSubmittedDtoException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
 
 class JwtMissingException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
 
@@ -31,3 +31,5 @@ class WeakPasswordException(msg: String, throwable: Throwable? = null) : CustomE
 class NothingToDoException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
 
 class NoContentException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
+
+class ImageSizeTooLargeException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)

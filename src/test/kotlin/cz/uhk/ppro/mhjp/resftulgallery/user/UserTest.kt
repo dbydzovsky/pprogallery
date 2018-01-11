@@ -8,10 +8,7 @@ import cz.uhk.ppro.mhjp.resftulgallery.dto.NewUserDto
 import cz.uhk.ppro.mhjp.resftulgallery.security.AuthorizationManager
 import cz.uhk.ppro.mhjp.resftulgallery.security.PasswordValidator
 import cz.uhk.ppro.mhjp.resftulgallery.service.UserServiceImpl
-import cz.uhk.ppro.mhjp.resftulgallery.util.DtoValidation
-import cz.uhk.ppro.mhjp.resftulgallery.util.HateoasUtil
-import cz.uhk.ppro.mhjp.resftulgallery.util.PasswordsDontMatchException
-import cz.uhk.ppro.mhjp.resftulgallery.util.UsernameAlreadyExistsException
+import cz.uhk.ppro.mhjp.resftulgallery.util.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,6 +32,9 @@ class UserTest {
 
     @Mock
     lateinit var dtoValidation: DtoValidation
+
+    @Mock
+    lateinit var responseBuilder: ResponseBuilder
 
     @Mock
     lateinit var hateoasUtil: HateoasUtil

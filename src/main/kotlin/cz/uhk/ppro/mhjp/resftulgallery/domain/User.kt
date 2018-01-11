@@ -15,5 +15,13 @@ data class User(
                 joinColumns = [(JoinColumn(name = "user_username"))],
                 inverseJoinColumns = [(JoinColumn(name = "role_id"))]
         )
-        val roles: List<Role>
+        val roles: List<Role>,
+        @OneToMany(mappedBy = "author")
+        val images: List<Image> = emptyList(),
+        @ManyToMany @JoinTable(
+                name = "liked_images",
+                joinColumns = [(JoinColumn(name = "user_username"))],
+                inverseJoinColumns = [(JoinColumn(name = "image_id"))]
+        )
+        val likedImages: List<Image> = emptyList()
 )
