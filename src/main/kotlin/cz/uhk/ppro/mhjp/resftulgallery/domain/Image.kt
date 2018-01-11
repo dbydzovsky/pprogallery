@@ -13,7 +13,9 @@ data class Image(
         @Lob
         val imageBytes: ByteArray,
         val dateUploaded: Long,
+        val private: Boolean,
+        val anonymous: Boolean = false,
         @ManyToOne
-        val author: User,
+        val author: User? = null,
         @ManyToMany(mappedBy = "likes") val likedByUsers: List<User> = emptyList()
 )

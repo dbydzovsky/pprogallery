@@ -17,7 +17,7 @@ class AuthorizationManagerImpl(private val jwtHandler: JwtHandler,
     override fun authorize(token: String?, entityOwner: String?, specifiedRoles: List<String>) {
         if (token == null) throw JwtMissingException("Unauthorized. Your token is missing.")
 
-        val userReq = userRepository.getOneByUsername(jwtHandler.validateToken(token), User::class.java)
+        val userReq = userRepository.getOneByUsername(jwtHandler.validateToken(token))
                 ?: throw TokenOwnerNotFoundException("Unauthorized. Token owner not found.")
 
         val finalRoles = defaultRoles.plus(specifiedRoles)

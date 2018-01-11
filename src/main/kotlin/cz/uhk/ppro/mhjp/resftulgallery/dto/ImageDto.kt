@@ -2,11 +2,13 @@ package cz.uhk.ppro.mhjp.resftulgallery.dto
 
 class NewImageDto(
         val description: String  = "",
-        val imageBytes: ByteArray = byteArrayOf()
+        val imageBytes: ByteArray = byteArrayOf(),
+        val private: Boolean = false
 )
 
 class UpdateImageDto(
-        val description: String = ""
+        val description: String = "",
+        val private: Boolean = false
 )
 
 open class NewImageDataDto(
@@ -14,15 +16,20 @@ open class NewImageDataDto(
         val description: String,
         val deleteHash: String,
         val imageBytes: ByteArray,
-        val author: ListUserDataDto
+        val private: Boolean,
+        val anonymous: Boolean,
+        val author: ListUserDataDto? = null,
+        val likedByUsers: List<DataDto>
 ) : DataDto()
 
 open class ImageDataDto(
         val uuid: String,
         val description: String,
         val imageBytes: ByteArray,
-        val author: ListUserDataDto,
-        val likedByUsers: List<ListUserDataDto>
+        val private: Boolean,
+        val anonymous: Boolean,
+        val author: ListUserDataDto? = null,
+        val likedByUsers: List<DataDto>
 ) : DataDto()
 
 open class ListImageDataDto(

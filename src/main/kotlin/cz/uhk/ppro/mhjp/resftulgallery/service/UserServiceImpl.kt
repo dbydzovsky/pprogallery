@@ -16,13 +16,13 @@ class UserServiceImpl(
         private val roleRepository: RoleRepository,
         private val authorizationManager: AuthorizationManager,
         private val passwordValidator: PasswordValidator,
-        private val dtoValidation: DtoValidation,
+        private val dtoValidator: DtoValidator,
         private val responseBuilder: ResponseBuilder,
         private val hateoasUtil: HateoasUtil
 ) : UserService {
 
     override fun createEntity(newType: NewUserDto, authorization: String?): ResponseEntity<ResponseDto> {
-        dtoValidation.validateDto(newType)
+        dtoValidator.validateDto(newType)
         val existingUser = userRepository.getOneByUsername(newType.username)
         if (existingUser != null)
             throw UsernameAlreadyExistsException("Error while creating new user. Username '${newType.username}' already exists.")
@@ -53,7 +53,7 @@ class UserServiceImpl(
         if (authorize) authorizationManager.authorize(authorization, idType)
         val editingUser = userRepository.getOneByUsername(idType) ?:
                 throw ContentNotFoundException("Error while editing user. User '$idType' not found.")
-        dtoValidation.validateDto(updateType)
+        dtoValidator.validateDto(updateType)
         val existingUser = userRepository.getOneByUsername(updateType.username)
         if (existingUser != null) throw UsernameAlreadyExistsException("Error while editing user. Username '$idType' already exists.")
         val editedUser = editingUser.copy(
@@ -64,7 +64,7 @@ class UserServiceImpl(
         userRepository.save(editedUser)
         val dto = UserDataDto(editedUser.username, editedUser.name, editedUser.dateJoined, editedUser.enabled, editedUser.private)
         val dtoWithLinks = hateoasUtil.addSelfObjectLink(dto)
-        return responseBuilder.buildSuccessfulResponse(200, "Successfully edited user '$idType'", dtoWithLinks)
+        return responseBuilder.buildSuccessfulResponse(200, "Successfully edited user '$idType'.", dtoWithLinks)
     }
 
     override fun deleteEntity(idType: String, authorization: String?, authorize: Boolean): ResponseEntity<ResponseDto> {
@@ -72,14 +72,14 @@ class UserServiceImpl(
         val user = userRepository.getOneByUsername(idType) ?:
                 throw ContentNotFoundException("Error while deleting user. User '$idType' not found.")
         userRepository.delete(user)
-        return responseBuilder.buildSuccessfulResponse(204, "Successfully deleted user '$idType'")
+        return responseBuilder.buildSuccessfulResponse(204, "Successfully deleted user '$idType'.")
     }
 
     override fun changePassword(username: String, updateUserPasswordDto: UpdateUserPasswordDto, authorization: String): ResponseEntity<ResponseDto> {
         authorizationManager.authorize(authorization, username)
         val user = userRepository.getOneByUsername(username) ?:
                 throw ContentNotFoundException("Error while updating passwords. User '$username' not found.")
-        dtoValidation.validateDto(updateUserPasswordDto)
+        dtoValidator.validateDto(updateUserPasswordDto)
         if (updateUserPasswordDto.newPassword != updateUserPasswordDto.repeatNewPassword)
             throw PasswordsDontMatchException("Error while updating passwords. New passwords don't match.")
         if (!passwordValidator.matchPasswords(updateUserPasswordDto.newPassword, user.password))
@@ -95,7 +95,7 @@ class UserServiceImpl(
         authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR"))
         val user = userRepository.getOneByUsername(username) ?:
                 throw ContentNotFoundException("Error while reporting user. User '$username' not found.")
-        dtoValidation.validateDto(report)
+        dtoValidator.validateDto(report)
         // todo implement
         return responseBuilder.buildSuccessfulResponse(204, "Successfully reported user '$username' for '${report.reason}'.")
     }

@@ -31,7 +31,7 @@ class UserTest {
     lateinit var passwordValidator: PasswordValidator
 
     @Mock
-    lateinit var dtoValidation: DtoValidation
+    lateinit var dtoValidator: DtoValidator
 
     @Mock
     lateinit var responseBuilder: ResponseBuilder
@@ -58,8 +58,8 @@ class UserTest {
         userService.createEntity(newDto)
 
         //then
-        verify(dtoValidation, times(1)).validateDto(any())
-        verify(userRepository, times(1)).getOneByUsername(any(), any<Class<Any>>())
+        verify(dtoValidator, times(1)).validateDto(any())
+        verify(userRepository, times(1)).getOneByUsername(any())
         verify(passwordValidator, times(1)).hashPassword(any(), any())
         verify(userRepository, times(1)).save(any<User>())
         verify(hateoasUtil, times(1)).addSelfObjectLink(any())
@@ -69,7 +69,7 @@ class UserTest {
     fun `Existing username return 409`() {
         //given
         val newDto = NewUserDto("user", "pass", "pass")
-        given(userRepository.getOneByUsername(any(), any<Class<Any>>()))
+        given(userRepository.getOneByUsername(any()))
                 .willReturn(User(
                         username = "user",
                         name = "",
@@ -88,8 +88,8 @@ class UserTest {
                     userService.createEntity(newDto)
                 }
         )
-        verify(dtoValidation, times(1)).validateDto(any())
-        verify(userRepository, times(1)).getOneByUsername(any(), any<Class<Any>>())
+        verify(dtoValidator, times(1)).validateDto(any())
+        verify(userRepository, times(1)).getOneByUsername(any())
     }
 
     @Test
@@ -105,8 +105,8 @@ class UserTest {
                     userService.createEntity(newDto)
                 }
         )
-        verify(dtoValidation, times(1)).validateDto(any())
-        verify(userRepository, times(1)).getOneByUsername(any(), any<Class<Any>>())
+        verify(dtoValidator, times(1)).validateDto(any())
+        verify(userRepository, times(1)).getOneByUsername(any())
     }
 
 }

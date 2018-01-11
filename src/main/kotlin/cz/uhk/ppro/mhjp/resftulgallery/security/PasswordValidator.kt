@@ -7,13 +7,12 @@ import org.springframework.stereotype.Component
 @Component
 class PasswordValidator {
 
-    companion object {
-        private const val PASS_LENGTH = 6
-        private const val PASS_NUMBERS = true
-        private const val PASS_UPPERCASE = true
-        private const val PASS_SPECIAL_SYMBOLS = false
-        private const val SPECIAL_SYMBOLS = "\$&+,:;=?@#|'<>.^*()%!-"
-    }
+    private var usePasswordConstraints = true
+    private var passLength = 6
+    private var passNumbers = true
+    private var passUppercase = true
+    private var passSpecialSymbols = false
+    private var specialSymbols = "\$&+,:;=?@#|'<>.^*()%!-"
 
     fun hashPassword(plainPass: String, validateConstraints: Boolean = true): String {
         if (validateConstraints) validatePasswordStrength(plainPass)
@@ -24,14 +23,17 @@ class PasswordValidator {
 
     private fun validatePasswordStrength(pass: String) {
 
-        val errors = mutableListOf<String>()
+        if (usePasswordConstraints) {
+            val errors = mutableListOf<String>()
 
-        if (pass.length < PASS_LENGTH) errors.add("Minimum length is $PASS_LENGTH symbols.")
-        if (PASS_NUMBERS && pass.contains(Regex("[0-9]"))) errors.add("Use at least one number.")
-        if (PASS_UPPERCASE && pass == pass.toLowerCase()) errors.add("Use at least one uppercase symbol.")
-        if (PASS_SPECIAL_SYMBOLS && pass.contains(Regex("[$SPECIAL_SYMBOLS]"))) errors.add("Use at least one special symbol.")
+            if (pass.length < passLength) errors.add("Minimum length is $passLength symbols.")
+            if (passNumbers && pass.contains(Regex("[0-9]"))) errors.add("Use at least one number.")
+            if (passUppercase && pass == pass.toLowerCase()) errors.add("Use at least one uppercase symbol.")
+            if (passSpecialSymbols && pass.contains(Regex("[$specialSymbols]"))) errors.add("Use at least one special symbol.")
 
-        if (errors.isNotEmpty()) throw WeakPasswordException("Your password is weak. ${errors.joinToString(separator = " ")}")
+            if (errors.isNotEmpty()) throw WeakPasswordException("Your password is not strong enough. ${errors.joinToString(separator = " ")}")
+        }
+
     }
 
 }

@@ -37,7 +37,7 @@ class AuthenticationServiceImpl (
             throw IncorrectAuthHeaderFormatException("Error during token generation. Authorization header has incorrect format.")
         }
 
-        val user = userRepository.getOneByUsername(username, User::class.java)
+        val user = userRepository.getOneByUsername(username)
                 ?: throw ContentNotFoundException("Error during token generation. User '$username' not found.")
 
         if (!passwordValidator.matchPasswords(password, user.password))

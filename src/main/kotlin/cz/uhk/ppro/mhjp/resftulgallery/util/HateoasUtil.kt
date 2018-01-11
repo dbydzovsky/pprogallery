@@ -36,9 +36,7 @@ class HateoasUtil {
         return dto
     }
 
-    fun addListItemsLinks(dtos: List<DataDto>, rel: String) {
-        for (dto in dtos) {
-            addObjectLink(dto, rel)
-        }
+    fun addListItemsLinks(dtos: List<DataDto>, rel: String): List<DataDto> {
+        return dtos.onEach { addObjectLink(it, rel) }
     }
 }
