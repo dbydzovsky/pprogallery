@@ -19,6 +19,8 @@ data class User(
         val roles: List<Role>,
         @OneToMany(mappedBy = "author")
         val images: List<Image> = emptyList(),
+        @OneToMany(mappedBy = "author")
+        val imageComments: List<ImageComment> = emptyList(),
         @ManyToMany @JoinTable(
                 name = "liked_images",
                 joinColumns = [(JoinColumn(name = "user_username"))],

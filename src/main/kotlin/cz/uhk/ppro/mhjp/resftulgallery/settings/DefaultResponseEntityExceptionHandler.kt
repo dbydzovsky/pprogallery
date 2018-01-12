@@ -27,7 +27,8 @@ class DefaultResponseEntityExceptionHandler(
                     is OutdatedJwtException,
                     is TokenOwnerNotFoundException,
                     is NoAuthHeaderException -> 401
-                    is ForbiddenContentException -> 403
+                    is ForbiddenContentException,
+                    is CommentOfPrivateImage -> 403
                     is ContentNotFoundException -> 404
                     is UsernameAlreadyExistsException -> 409
                     is PasswordsDontMatchException,

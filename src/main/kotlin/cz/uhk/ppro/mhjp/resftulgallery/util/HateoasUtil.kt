@@ -2,6 +2,7 @@ package cz.uhk.ppro.mhjp.resftulgallery.util
 
 import com.nhaarman.mockito_kotlin.any
 import cz.uhk.ppro.mhjp.resftulgallery.dto.*
+import cz.uhk.ppro.mhjp.resftulgallery.rest.ImageCommentController
 import cz.uhk.ppro.mhjp.resftulgallery.rest.ImageController
 import cz.uhk.ppro.mhjp.resftulgallery.rest.UserController
 import org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo
@@ -46,8 +47,16 @@ class HateoasUtil {
                     .retrieveImage(dto.uuid, any()))
                     .withRel(rel)
             )
+            is CommentDataDto -> dto.add(linkTo(methodOn(ImageCommentController::class.java)
+                    .getComment(dto.uuid, any()))
+                    .withRel(rel)
+            )
+            is ListCommentDataDto -> dto.add(linkTo(methodOn(ImageCommentController::class.java)
+                    .getComment(dto.uuid, any()))
+                    .withRel(rel)
+            )
             else -> {
-                throw UnknownDtoException("Unsupported response format!")
+                throw UnknownDtoException("Unsupported response format.")
             }
         }
         return dto

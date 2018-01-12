@@ -16,16 +16,14 @@ open class NewImageDataDto(
         val description: String,
         val imageBytes: ByteArray,
         val private: Boolean,
-        val author: ListUserDataDto,
-        val likedByUsers: List<DataDto>
+        val author: ListUserDataDto
 ) : DataDto()
 
 open class NewAnonImageDataDto(
         val uuid: String,
         val deleteHash: String,
         val description: String,
-        val imageBytes: ByteArray,
-        val likedByUsers: List<DataDto>
+        val imageBytes: ByteArray
 ) : DataDto()
 
 open class ImageDataDto(
@@ -34,14 +32,16 @@ open class ImageDataDto(
         val imageBytes: ByteArray,
         val private: Boolean,
         val author: ListUserDataDto,
-        val likedByUsers: List<DataDto>
+        val likedByUsers: List<DataDto>,
+        val comments: List<DataDto>
 ) : DataDto()
 
 open class AnonImageDataDto(
         val uuid: String,
         val description: String,
         val imageBytes: ByteArray,
-        val likedByUsers: List<DataDto>
+        val likedByUsers: List<DataDto>,
+        val comments: List<DataDto>
 ) : DataDto()
 
 open class ListImageDataDto(

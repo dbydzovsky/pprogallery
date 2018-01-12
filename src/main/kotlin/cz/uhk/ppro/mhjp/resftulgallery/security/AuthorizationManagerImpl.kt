@@ -14,7 +14,7 @@ class AuthorizationManagerImpl(private val jwtHandler: JwtHandler,
 
     private val defaultRoles = listOf("ROLE_ADMIN")
 
-    override fun authorize(token: String?, entityOwner: String?, specifiedRoles: List<String>) {
+    override fun authorize(token: String?, entityOwner: String?, specifiedRoles: List<String>): User {
         if (token == null) throw JwtMissingException("Unauthorized. Your token is missing.")
 
         val userReq = userRepository.getOneByUsername(jwtHandler.validateToken(token))
@@ -23,9 +23,11 @@ class AuthorizationManagerImpl(private val jwtHandler: JwtHandler,
         val finalRoles = defaultRoles.plus(specifiedRoles)
         finalRoles.distinct()
 
-        if (!Collections.disjoint(userReq.roles.map { it.name }, finalRoles)) return
+        if (!Collections.disjoint(userReq.roles.map { it.name }, finalRoles)) return userReq
 
         if (entityOwner != userReq.username)
             throw ForbiddenContentException("Forbidden. You don't have rights to do this action.")
+
+        return userReq
     }
 }

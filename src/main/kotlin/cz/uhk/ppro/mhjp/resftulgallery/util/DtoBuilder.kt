@@ -1,6 +1,7 @@
 package cz.uhk.ppro.mhjp.resftulgallery.util
 
 import cz.uhk.ppro.mhjp.resftulgallery.domain.Image
+import cz.uhk.ppro.mhjp.resftulgallery.domain.ImageComment
 import cz.uhk.ppro.mhjp.resftulgallery.domain.Role
 import cz.uhk.ppro.mhjp.resftulgallery.domain.User
 import cz.uhk.ppro.mhjp.resftulgallery.dto.*
@@ -40,7 +41,8 @@ class DtoBuilder(
                     imageBytes = image.imageBytes,
                     private = image.private,
                     author = hateoasUtil.addObjectLink(getListUserDto(image.author!!), "author") as ListUserDataDto,
-                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "likes")
+                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "user_like"),
+                    comments = hateoasUtil.addListItemsLinks(image.comments.map { getListCommentDto(it) }, "comment")
             )
 
     )
@@ -51,7 +53,8 @@ class DtoBuilder(
                     uuid = image.uuid,
                     description = image.description,
                     imageBytes = image.imageBytes,
-                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "likes")
+                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "user_like"),
+                    comments = hateoasUtil.addListItemsLinks(image.comments.map { getListCommentDto(it) }, "comment")
             )
 
     )
@@ -63,8 +66,7 @@ class DtoBuilder(
                     description = image.description,
                     imageBytes = image.imageBytes,
                     private = image.private,
-                    author = hateoasUtil.addObjectLink(getListUserDto(image.author!!), "author") as ListUserDataDto,
-                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "likes")
+                    author = hateoasUtil.addObjectLink(getListUserDto(image.author!!), "author") as ListUserDataDto
             )
     )
 
@@ -74,8 +76,7 @@ class DtoBuilder(
                     uuid = image.uuid,
                     deleteHash = image.deleteHash,
                     description = image.description,
-                    imageBytes = image.imageBytes,
-                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "likes")
+                    imageBytes = image.imageBytes
             )
     )
 
@@ -84,11 +85,28 @@ class DtoBuilder(
             uuid = image.uuid
     )
 
+    // -------------Comment DTOs-------------
+
+    fun getCommentDto(comment: ImageComment)
+            = hateoasUtil.addSelfObjectLink(
+            CommentDataDto(
+                    uuid = comment.uuid,
+                    author = hateoasUtil.addObjectLink(ListUserDataDto(comment.author.name), "author") as ListUserDataDto,
+                    image = hateoasUtil.addObjectLink(ListImageDataDto(comment.image.uuid), "commented_image") as ListImageDataDto,
+                    content = comment.content
+            )
+    )
+
+    private fun getListCommentDto(comment: ImageComment): ListCommentDataDto
+            = ListCommentDataDto(
+            uuid = comment.uuid
+    )
+
     // -------------Role DTOs-------------
 
     fun getRolesDto(roles: List<Role>)
             = RolesListDto(
-            roles = roles.map { RoleDto(it.name) }
+            roles = roles.map { it.name }
     )
 
 }

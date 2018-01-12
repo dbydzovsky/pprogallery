@@ -35,3 +35,5 @@ class NoContentException(msg: String, throwable: Throwable? = null) : CustomExce
 class ImageSizeTooLargeException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
 
 class AnonImagePrivateException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
+
+class CommentOfPrivateImage(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)

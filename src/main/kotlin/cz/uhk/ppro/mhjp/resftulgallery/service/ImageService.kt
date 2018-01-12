@@ -1,9 +1,6 @@
 package cz.uhk.ppro.mhjp.resftulgallery.service
 
-import cz.uhk.ppro.mhjp.resftulgallery.dto.NewImageDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.ResponseDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.SubmitReportDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.UpdateImageDto
+import cz.uhk.ppro.mhjp.resftulgallery.dto.*
 import org.springframework.http.ResponseEntity
 
 interface ImageService : CrudService<NewImageDto, UpdateImageDto, String> {

@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity
 
 interface CrudService<in NewType, in UpdateType, in IdType> {
 
-    fun createEntity(newType: NewType, authorization: String? = null): ResponseEntity<ResponseDto>
+    fun createEntity(newType: NewType, authorization: String? = null, parent: String? = null): ResponseEntity<ResponseDto>
 
     fun readEntity(idType: IdType, authorization: String? = null): ResponseEntity<ResponseDto>
 
