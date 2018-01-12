@@ -123,8 +123,8 @@ class UserServiceImpl(
         authorizationManager.authorize(authorization)
         val user = userRepository.getOneByUsername(username)
                 ?: throw ContentNotFoundException("Error while getting $username's roles. User '$username' not found.")
-        val roles = user.roles.map { RoleDto(it.name) }
-        return responseBuilder.buildSuccessfulResponse(200, "User '$username' roles successfully retrieved.", *roles.toTypedArray())
+        val roles = dtoBuilder.getRolesDto(user.roles)
+        return responseBuilder.buildSuccessfulResponse(200, "User '$username' roles successfully retrieved.", roles)
     }
 
     override fun updateUserRoles(username: String, authorization: String, roles: List<String>): ResponseEntity<ResponseDto> {

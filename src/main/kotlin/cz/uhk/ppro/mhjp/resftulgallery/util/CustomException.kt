@@ -33,3 +33,5 @@ class NothingToDoException(msg: String, throwable: Throwable? = null) : CustomEx
 class NoContentException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
 
 class ImageSizeTooLargeException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)
+
+class AnonImagePrivateException(msg: String, throwable: Throwable? = null) : CustomException(msg, throwable)

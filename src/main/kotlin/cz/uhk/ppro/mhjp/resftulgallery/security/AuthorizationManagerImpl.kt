@@ -27,11 +27,5 @@ class AuthorizationManagerImpl(private val jwtHandler: JwtHandler,
 
         if (entityOwner != userReq.username)
             throw ForbiddenContentException("Forbidden. You don't have rights to do this action.")
-
-//        val finalRoles = defaultRoles.plus(specifiedRoles)
-//        finalRoles.distinct()
-//
-//        if (Collections.disjoint(userReq.roles.map { it.name }, finalRoles))
-//            throw ForbiddenContentException("Forbidden. You don't have rights to do this action.")
     }
 }

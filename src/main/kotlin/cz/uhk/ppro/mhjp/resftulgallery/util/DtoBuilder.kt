@@ -1,6 +1,7 @@
 package cz.uhk.ppro.mhjp.resftulgallery.util
 
 import cz.uhk.ppro.mhjp.resftulgallery.domain.Image
+import cz.uhk.ppro.mhjp.resftulgallery.domain.Role
 import cz.uhk.ppro.mhjp.resftulgallery.domain.User
 import cz.uhk.ppro.mhjp.resftulgallery.dto.*
 import org.springframework.stereotype.Component
@@ -10,6 +11,8 @@ class DtoBuilder(
         private val hateoasUtil: HateoasUtil
 ) {
 
+    // -------------User DTOs-------------
+
     fun getUserDto(user: User): DataDto
             = hateoasUtil.addSelfObjectLink(
             UserDataDto(
@@ -17,7 +20,8 @@ class DtoBuilder(
                     name = user.name,
                     dateJoined = user.dateJoined,
                     enabled = user.enabled,
-                    private = user.private
+                    private = user.private,
+                    images = hateoasUtil.addListItemsLinks(user.images.map { getListImageDto(it) }, "uploaded_image")
             )
     )
 
@@ -26,6 +30,8 @@ class DtoBuilder(
             username = user.username
     )
 
+    // -------------Image DTOs-------------
+
     fun getImageDto(image: Image): DataDto
             = hateoasUtil.addSelfObjectLink(
             ImageDataDto(
@@ -33,17 +39,18 @@ class DtoBuilder(
                     description = image.description,
                     imageBytes = image.imageBytes,
                     private = image.private,
-                    anonymous = image.anonymous,
-                    author = if (image.author != null) {
-                        hateoasUtil.addObjectLink(
-                                getListUserDto(
-                                        image.author
-                                ),
-                                "author"
-                        ) as ListUserDataDto
-                    } else {
-                        null
-                    },
+                    author = hateoasUtil.addObjectLink(getListUserDto(image.author!!), "author") as ListUserDataDto,
+                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "likes")
+            )
+
+    )
+
+    fun getAnonImageDto(image: Image): DataDto
+            = hateoasUtil.addSelfObjectLink(
+            AnonImageDataDto(
+                    uuid = image.uuid,
+                    description = image.description,
+                    imageBytes = image.imageBytes,
                     likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "likes")
             )
 
@@ -54,30 +61,34 @@ class DtoBuilder(
             NewImageDataDto(
                     uuid = image.uuid,
                     description = image.description,
-                    deleteHash = image.deleteHash,
                     imageBytes = image.imageBytes,
                     private = image.private,
-                    anonymous = image.anonymous,
-                    author = if (image.author != null) {
-                        hateoasUtil.addObjectLink(
-                                getListUserDto(
-                                        image.author
-                                ),
-                                "author"
-                        ) as ListUserDataDto
-                    } else {
-                        null
-                    },
+                    author = hateoasUtil.addObjectLink(getListUserDto(image.author!!), "author") as ListUserDataDto,
                     likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "likes")
             )
     )
 
-    fun getImagesDtos(images: List<Image>, rel: String)
-            = hateoasUtil.addListItemsLinks(images.map { getListImageDto(it) }, rel)
+    fun getNewAnonImageDto(image: Image): DataDto
+            = hateoasUtil.addSelfObjectLink(
+            NewAnonImageDataDto(
+                    uuid = image.uuid,
+                    deleteHash = image.deleteHash,
+                    description = image.description,
+                    imageBytes = image.imageBytes,
+                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "likes")
+            )
+    )
 
     private fun getListImageDto(image: Image): ListImageDataDto
             = ListImageDataDto(
             uuid = image.uuid
+    )
+
+    // -------------Role DTOs-------------
+
+    fun getRolesDto(roles: List<Role>)
+            = RolesListDto(
+            roles = roles.map { RoleDto(it.name) }
     )
 
 }

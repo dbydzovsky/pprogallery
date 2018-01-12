@@ -24,23 +24,22 @@ class ImageServiceImpl(
 
     override fun createEntity(newType: NewImageDto, authorization: String?): ResponseEntity<ResponseDto> {
         dtoValidator.validateDto(newType)
-        val maxId = imageRepository.getMaxId() + 1
         val image = if (authorization == null) {
             Image(
-                    uuid = hashGenerator.hashIdToUuid(maxId),
+                    uuid = hashGenerator.hashIdToUuid(System.currentTimeMillis()),
                     description = newType.description,
-                    deleteHash = hashGenerator.hashIdToDeleteHash(maxId),
+                    deleteHash = hashGenerator.hashIdToDeleteHash(System.currentTimeMillis()),
                     imageBytes = newType.imageBytes,
                     anonymous = true,
-                    private = newType.private
+                    private = false
             )
         } else {
             val author = userRepository.getOneByUsername(jwtHandler.validateToken(authorization)) ?:
                     throw TokenOwnerNotFoundException("Error while uploading image. User not found.")
             Image(
-                    uuid = hashGenerator.hashIdToUuid(maxId),
+                    uuid = hashGenerator.hashIdToUuid(System.currentTimeMillis()),
                     description = newType.description,
-                    deleteHash = hashGenerator.hashIdToDeleteHash(maxId),
+                    deleteHash = hashGenerator.hashIdToDeleteHash(System.currentTimeMillis()),
                     imageBytes = newType.imageBytes,
                     dateUploaded = System.currentTimeMillis(),
                     author = author,
@@ -48,7 +47,7 @@ class ImageServiceImpl(
             )
         }
         imageRepository.save(image)
-        val dto = dtoBuilder.getNewImageDto(image)
+        val dto = if (authorization == null) dtoBuilder.getNewAnonImageDto(image) else dtoBuilder.getNewImageDto(image)
         return responseBuilder.buildSuccessfulResponse(200, "Image successfully uploaded", dto)
     }
 
@@ -56,21 +55,23 @@ class ImageServiceImpl(
         val image = imageRepository.getOneByUuid(idType) ?:
                 throw ContentNotFoundException("Error while retrieving image. Image not found.")
         if (image.private) authorizationManager.authorize(authorization, idType)
-        val dto = dtoBuilder.getImageDto(image)
+        val dto = if (image.anonymous) dtoBuilder.getAnonImageDto(image) else dtoBuilder.getImageDto(image)
         return responseBuilder.buildSuccessfulResponse(200, "Successfully retrieved image.", dto)
     }
 
     override fun updateEntity(idType: String, updateType: UpdateImageDto, authorization: String?, authorize: Boolean): ResponseEntity<ResponseDto> {
         if (authorize) authorizationManager.authorize(authorization, idType)
-        val editingImage = imageRepository.getOneByUuid(idType) ?:
-                throw ContentNotFoundException("Error while editing image description. Image not found.")
+        val editingImage = imageRepository.getOneByUuid(idType)
+                ?: throw ContentNotFoundException("Error while editing image description. Image not found.")
+        if (editingImage.anonymous && updateType.private)
+            throw AnonImagePrivateException("Error while editing image. Anonymous image cannot be private.")
         dtoValidator.validateDto(updateType)
         val editedImage = editingImage.copy(
                 description = updateType.description,
                 private = editingImage.private
         )
         imageRepository.save(editedImage)
-        val dto = dtoBuilder.getImageDto(editedImage)
+        val dto = if (editedImage.anonymous) dtoBuilder.getAnonImageDto(editedImage) else dtoBuilder.getImageDto(editedImage)
         return responseBuilder.buildSuccessfulResponse(200, "Successfully edited image.", dto)
     }
 
@@ -82,12 +83,24 @@ class ImageServiceImpl(
         return responseBuilder.buildSuccessfulResponse(204, "Successfully deleted image.")
     }
 
-    override fun updateImageWithDeleteHash(uuid: String, updateImage: UpdateImageDto): ResponseEntity<ResponseDto> {
-        return updateEntity(uuid, updateImage)
+    override fun updateImageWithDeleteHash(uuid: String, deleteHash: String, updateImage: UpdateImageDto): ResponseEntity<ResponseDto> {
+        val image = imageRepository.getOneByUuid(uuid)
+                ?: throw ContentNotFoundException("Error while editing image description. Image not found.")
+        if (image.deleteHash == deleteHash) {
+            return updateEntity(idType = uuid, updateType = updateImage, authorize = false)
+        } else {
+            throw ForbiddenContentException("Forbidden. You don't have rights to do this action.")
+        }
     }
 
-    override fun deleteImageWithDeleteHash(uuid: String): ResponseEntity<ResponseDto> {
-        return deleteEntity(uuid)
+    override fun deleteImageWithDeleteHash(uuid: String, deleteHash: String): ResponseEntity<ResponseDto> {
+        val image = imageRepository.getOneByUuid(uuid)
+                ?: throw ContentNotFoundException("Error while deleting image description. Image not found.")
+        if (image.deleteHash == deleteHash) {
+            return deleteEntity(idType = uuid, authorize = false)
+        } else {
+            throw ForbiddenContentException("Forbidden. You don't have rights to do this action.")
+        }
     }
 
     override fun reportImage(uuid: String, report: SubmitReportDto, authorization: String): ResponseEntity<ResponseDto> {
@@ -95,12 +108,21 @@ class ImageServiceImpl(
     }
 
     override fun like(uuid: String, authorization: String): ResponseEntity<ResponseDto> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getAll(): ResponseEntity<ResponseDto> {
-        val images = imageRepository.findAll()
-        val dtos = dtoBuilder.getImagesDtos(images, "image")
-        return responseBuilder.buildSuccessfulResponse(200, "asdf", *dtos.toTypedArray())
+        val image = imageRepository.getOneByUuid(uuid)
+                ?: throw ContentNotFoundException("Error while liking image. Image not found.")
+        val user = userRepository.getOneByUsername(jwtHandler.validateToken(authorization))
+                ?: throw TokenOwnerNotFoundException("Error while liking image. User not found.")
+        if (user.likedImages.contains(image)) {
+            val newUser = user.copy(
+                    likedImages = user.likedImages.minus(image)
+            )
+            userRepository.save(newUser)
+        } else {
+            val newUser = user.copy(
+                    likedImages = user.likedImages.plus(image)
+            )
+            userRepository.save(newUser)
+        }
+        return responseBuilder.buildSuccessfulResponse(204, "Successfully liked/unliked image.")
     }
 }

@@ -8,9 +8,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ImageRepository : JpaRepository<Image, Long> {
 
-    @Query("SELECT COALESCE(MAX(id), 0) from Image")
-    fun getMaxId(): Long
-
     fun getOneByUuid(uuid: String): Image?
 
 }

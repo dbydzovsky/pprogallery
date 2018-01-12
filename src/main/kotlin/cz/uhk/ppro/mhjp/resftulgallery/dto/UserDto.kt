@@ -23,7 +23,8 @@ open class UserDataDto(
         val name: String,
         val dateJoined: Long,
         val enabled: Boolean,
-        val private: Boolean
+        val private: Boolean,
+        val images: List<DataDto>
 ) : DataDto()
 
 open class ListUserDataDto(

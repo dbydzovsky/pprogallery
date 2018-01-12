@@ -1,9 +1,11 @@
 package cz.uhk.ppro.mhjp.resftulgallery.util
 
+import com.nhaarman.mockito_kotlin.any
 import cz.uhk.ppro.mhjp.resftulgallery.dto.*
 import cz.uhk.ppro.mhjp.resftulgallery.rest.ImageController
 import cz.uhk.ppro.mhjp.resftulgallery.rest.UserController
 import org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo
+import org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn
 import org.springframework.stereotype.Component
 
 @Component
@@ -11,29 +13,37 @@ class HateoasUtil {
 
     fun addObjectLink(dto: DataDto, rel: String): DataDto {
         when (dto) {
-            is UserDataDto -> dto.add(linkTo(UserController::class.java)
-                    .slash("u")
-                    .slash(dto.username)
+            is UserDataDto -> dto.add(linkTo(methodOn(UserController::class.java)
+                    .retrieveUser(dto.username, any()))
                     .withRel(rel)
             )
-            is ListUserDataDto -> dto.add(linkTo(UserController::class.java)
-                    .slash("u")
-                    .slash(dto.username)
+            is ListUserDataDto -> dto.add(linkTo(methodOn(UserController::class.java)
+                    .retrieveUser(dto.username, any()))
                     .withRel(rel)
             )
-            is NewImageDataDto -> dto.add(linkTo(ImageController::class.java)
-                    .slash("i")
-                    .slash(dto.uuid)
+            is NewImageDataDto -> dto.add(linkTo(methodOn(ImageController::class.java)
+                    .retrieveImage(dto.uuid, any()))
+                    .withRel(rel)
+                )
+            is NewAnonImageDataDto -> {
+                dto.add(linkTo(methodOn(ImageController::class.java)
+                        .retrieveImage(dto.uuid, any()))
+                        .withRel(rel)
+                )
+                dto.add(linkTo(methodOn(ImageController::class.java)
+                        .deleteImageWithDeleteHash(dto.uuid, dto.deleteHash))
+                        .withRel("delete_hash"))
+            }
+            is ImageDataDto -> dto.add(linkTo(methodOn(ImageController::class.java)
+                    .retrieveImage(dto.uuid, any()))
                     .withRel(rel)
             )
-            is ImageDataDto -> dto.add(linkTo(ImageController::class.java)
-                    .slash("i")
-                    .slash(dto.uuid)
+            is AnonImageDataDto -> dto.add(linkTo(methodOn(ImageController::class.java)
+                    .retrieveImage(dto.uuid, any()))
                     .withRel(rel)
             )
-            is ListImageDataDto -> dto.add(linkTo(ImageController::class.java)
-                    .slash("i")
-                    .slash(dto.uuid)
+            is ListImageDataDto -> dto.add(linkTo(methodOn(ImageController::class.java)
+                    .retrieveImage(dto.uuid, any()))
                     .withRel(rel)
             )
             else -> {

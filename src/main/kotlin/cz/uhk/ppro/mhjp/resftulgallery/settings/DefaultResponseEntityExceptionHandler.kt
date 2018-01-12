@@ -33,7 +33,8 @@ class DefaultResponseEntityExceptionHandler(
                     is PasswordsDontMatchException,
                     is NoContentException,
                     is WeakPasswordException,
-                    is ImageSizeTooLargeException -> 422
+                    is ImageSizeTooLargeException,
+                    is AnonImagePrivateException -> 422
                 },
                 ex.message!!
         )

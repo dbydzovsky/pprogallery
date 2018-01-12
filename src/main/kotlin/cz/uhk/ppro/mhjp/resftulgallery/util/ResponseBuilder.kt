@@ -28,7 +28,7 @@ class ResponseBuilder {
         }
     }
 
-    fun buildSuccessfulResponse(responseCode: Int, successMessage: String, vararg data: DataDtoBase, headers: List<Pair<String, String>> = emptyList()): ResponseEntity<ResponseDto> {
+    fun buildSuccessfulResponse(responseCode: Int, successMessage: String, data: DataDtoBase? = null, headers: List<Pair<String, String>> = emptyList()): ResponseEntity<ResponseDto> {
         return if (headers.isNotEmpty()) {
             val httpHeaders = HttpHeaders()
             headers.forEach { httpHeaders.add(it.first, it.second) }
@@ -38,7 +38,7 @@ class ResponseBuilder {
                     .body(SuccessResponseDto(
                             responseCode = responseCode,
                             message = successMessage,
-                            data = data.toList()
+                            data = data
                     ))
         } else {
             ResponseEntity
@@ -46,7 +46,7 @@ class ResponseBuilder {
                     .body(SuccessResponseDto(
                             responseCode = responseCode,
                             message = successMessage,
-                            data = data.toList()
+                            data = data
                     ))
         }
     }

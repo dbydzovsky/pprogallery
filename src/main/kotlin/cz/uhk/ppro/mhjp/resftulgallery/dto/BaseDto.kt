@@ -16,7 +16,7 @@ open class ResponseDto(
 class SuccessResponseDto(
         responseCode: Int,
         val message: String,
-        val data: List<DataDtoBase>
+        val data: DataDtoBase?
 ) : ResponseDto(responseCode, true)
 
 class ErrorResponseDto(
