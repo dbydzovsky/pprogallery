@@ -2,6 +2,7 @@ package cz.uhk.ppro.mhjp.resftulgallery.util
 
 import com.nhaarman.mockito_kotlin.any
 import cz.uhk.ppro.mhjp.resftulgallery.dto.*
+import cz.uhk.ppro.mhjp.resftulgallery.rest.GalleryController
 import cz.uhk.ppro.mhjp.resftulgallery.rest.ImageCommentController
 import cz.uhk.ppro.mhjp.resftulgallery.rest.ImageController
 import cz.uhk.ppro.mhjp.resftulgallery.rest.UserController
@@ -53,6 +54,14 @@ class HateoasUtil {
             )
             is ListCommentDataDto -> dto.add(linkTo(methodOn(ImageCommentController::class.java)
                     .getComment(dto.uuid, any()))
+                    .withRel(rel)
+            )
+            is GalleryDataDto -> dto.add(linkTo(methodOn(GalleryController::class.java)
+                    .retrieveGallery(dto.uuid, any()))
+                    .withRel(rel)
+            )
+            is ListGalleryDataDto -> dto.add(linkTo(methodOn(GalleryController::class.java)
+                    .retrieveGallery(dto.uuid, any()))
                     .withRel(rel)
             )
             else -> {
