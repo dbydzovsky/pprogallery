@@ -17,14 +17,12 @@ class AuthenticationServiceImpl (
         private val userRepository: UserRepository,
         private val jwtHandler: JwtHandler,
         private val passwordValidator: PasswordValidator,
-        private val responseBuilder: ResponseBuilder
+        private val responseBuilder: ResponseBuilder,
+        private val dtoBuilder: DtoBuilder
 ) : AuthenticationService {
 
-    override fun createJwtFromCredentials(request: HttpServletRequest): ResponseEntity<ResponseDto> {
-        val basic = request.getHeader("Authorization")
-                ?: throw NoAuthHeaderException("Error during token generation. Authorization header not found.")
-
-        val credentialsB64 = basic.replace("Basic ", "")
+    override fun createJwtFromCredentials(authorization: String): ResponseEntity<ResponseDto> {
+        val credentialsB64 = authorization.replace("Basic ", "")
         val credentials = try {
             String(Base64.getDecoder().decode(credentialsB64))
         } catch (e: IllegalArgumentException) {
@@ -49,4 +47,10 @@ class AuthenticationServiceImpl (
 
     }
 
+    override fun getTokenUser(authorization: String): ResponseEntity<ResponseDto> {
+        val authenticatedUser = userRepository.getOneByUsername(jwtHandler.validateToken(authorization))
+                ?: throw TokenOwnerNotFoundException("Error during user identification. Token owner not found.")
+        val dto = dtoBuilder.getListUserDto(authenticatedUser, "self")
+        return responseBuilder.buildSuccessfulResponse(200, "Successfully retrieved token owner.", dto)
+    }
 }

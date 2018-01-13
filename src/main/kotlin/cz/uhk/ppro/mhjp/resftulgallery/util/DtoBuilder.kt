@@ -18,11 +18,11 @@ class DtoBuilder(
                     dateJoined = user.dateJoined,
                     enabled = user.enabled,
                     private = user.private,
-                    images = hateoasUtil.addListItemsLinks(user.images.map { getListImageDto(it) }, "uploaded_image")
+                    images = user.images.map { getListImageDto(it, "uploaded_image") }
             )
     )
 
-    private fun getListUserDto(user: User) = ListUserDataDto(username = user.username)
+    fun getListUserDto(user: User, rel: String) = hateoasUtil.addObjectLink(ListUserDataDto(username = user.username), rel)
 
     // -------------Image DTOs-------------
 
@@ -32,9 +32,9 @@ class DtoBuilder(
                     description = image.description,
                     imageBytes = image.imageBytes,
                     private = image.private,
-                    author = hateoasUtil.addObjectLink(getListUserDto(image.author!!), "author") as ListUserDataDto,
-                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "user_like"),
-                    comments = hateoasUtil.addListItemsLinks(image.comments.map { getListCommentDto(it) }, "comment")
+                    author = getListUserDto(image.author!!, "author") as ListUserDataDto,
+                    likedByUsers = image.likedByUsers.map { getListUserDto(it, "likes") },
+                    comments = image.comments.map { getListCommentDto(it, "comment") }
             )
 
     )
@@ -44,8 +44,8 @@ class DtoBuilder(
                     uuid = image.uuid,
                     description = image.description,
                     imageBytes = image.imageBytes,
-                    likedByUsers = hateoasUtil.addListItemsLinks(image.likedByUsers.map { getListUserDto(it) }, "user_like"),
-                    comments = hateoasUtil.addListItemsLinks(image.comments.map { getListCommentDto(it) }, "comment")
+                    likedByUsers = image.likedByUsers.map { getListUserDto(it, "likes") },
+                    comments = image.comments.map { getListCommentDto(it, "comment") }
             )
 
     )
@@ -56,7 +56,7 @@ class DtoBuilder(
                     description = image.description,
                     imageBytes = image.imageBytes,
                     private = image.private,
-                    author = hateoasUtil.addObjectLink(getListUserDto(image.author!!), "author") as ListUserDataDto
+                    author = getListUserDto(image.author!!, "author") as ListUserDataDto
             )
     )
 
@@ -69,20 +69,20 @@ class DtoBuilder(
             )
     )
 
-    private fun getListImageDto(image: Image) = ListImageDataDto(uuid = image.uuid)
+    fun getListImageDto(image: Image, rel: String) = hateoasUtil.addObjectLink(ListImageDataDto(uuid = image.uuid), rel)
 
     // -------------Comment DTOs-------------
 
     fun getCommentDto(comment: ImageComment) = hateoasUtil.addSelfObjectLink(
             CommentDataDto(
                     uuid = comment.uuid,
-                    author = hateoasUtil.addObjectLink(ListUserDataDto(comment.author.name), "author") as ListUserDataDto,
-                    image = hateoasUtil.addObjectLink(ListImageDataDto(comment.image.uuid), "commented_image") as ListImageDataDto,
+                    author = getListUserDto(comment.author, "author") as ListUserDataDto,
+                    image = getListImageDto(comment.image, "is_comment_of") as ListImageDataDto,
                     content = comment.content
             )
     )
 
-    private fun getListCommentDto(comment: ImageComment) = ListCommentDataDto(uuid = comment.uuid)
+    fun getListCommentDto(comment: ImageComment, rel: String) = hateoasUtil.addObjectLink(ListCommentDataDto(uuid = comment.uuid), rel)
 
     // -------------Gallery DTOs------------
 
@@ -91,12 +91,12 @@ class DtoBuilder(
                     uuid = gallery.uuid,
                     title = gallery.title,
                     private = gallery.private,
-                    images = hateoasUtil.addListItemsLinks(gallery.images.map { getListImageDto(it) }, "image"),
-                    author = hateoasUtil.addObjectLink(getListUserDto(gallery.author), "author") as ListUserDataDto
+                    images = gallery.images.map { getListImageDto(it, "gallery_image") },
+                    author = getListUserDto(gallery.author, "author") as ListUserDataDto
             )
     )
 
-    private fun getListGalleryDto(gallery: Gallery) = ListGalleryDataDto(uuid = gallery.uuid)
+    fun getListGalleryDto(gallery: Gallery, rel:String) = hateoasUtil.addObjectLink(ListGalleryDataDto(uuid = gallery.uuid), rel)
 
     // -------------Role DTOs-------------
 

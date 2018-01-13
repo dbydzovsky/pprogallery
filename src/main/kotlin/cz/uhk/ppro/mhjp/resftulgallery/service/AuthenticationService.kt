@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest
 
 interface AuthenticationService {
 
-    fun createJwtFromCredentials(request: HttpServletRequest): ResponseEntity<ResponseDto>
+    fun createJwtFromCredentials(authorization: String): ResponseEntity<ResponseDto>
+
+    fun getTokenUser(authorization: String): ResponseEntity<ResponseDto>
 
 }

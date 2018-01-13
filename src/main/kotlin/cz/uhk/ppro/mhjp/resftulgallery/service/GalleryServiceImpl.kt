@@ -52,8 +52,7 @@ class GalleryServiceImpl(
         authorizationManager.authorize(authorization, galleryToBeEdited.author.name)
         val editedGallery = galleryToBeEdited.copy(
                 title = updateType.title,
-                private = updateType.private,
-                images = updateType.images.mapNotNull { imageRepository.getOneByUuid(it) }
+                private = updateType.private
         )
         galleryRepository.save(editedGallery)
         val dto = dtoBuilder.getGalleryDto(editedGallery)

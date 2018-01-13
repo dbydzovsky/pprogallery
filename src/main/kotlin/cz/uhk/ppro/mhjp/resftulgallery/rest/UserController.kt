@@ -1,7 +1,6 @@
 package cz.uhk.ppro.mhjp.resftulgallery.rest
 
 import cz.uhk.ppro.mhjp.resftulgallery.dto.NewUserDto
-import cz.uhk.ppro.mhjp.resftulgallery.dto.SubmitReportDto
 import cz.uhk.ppro.mhjp.resftulgallery.dto.UpdateUserDto
 import cz.uhk.ppro.mhjp.resftulgallery.dto.UpdateUserPasswordDto
 import cz.uhk.ppro.mhjp.resftulgallery.service.UserService
