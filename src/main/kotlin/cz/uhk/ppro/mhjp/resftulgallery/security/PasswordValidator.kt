@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 class PasswordValidator {
 
     companion object {
-        private const val USE_PASSWORD_CONSTRAINTS = true
         private const val PASS_LENGTH = 6
         private const val PASS_NUMBERS = true
         private const val PASS_UPPERCASE = true
@@ -17,15 +16,15 @@ class PasswordValidator {
     }
 
     fun hashPassword(plainPass: String, validateConstraints: Boolean = true): String {
-        if (validateConstraints) validatePasswordStrength(plainPass)
+        if (validateConstraints) validatePasswordStrength(plainPass, validateConstraints)
         return BCrypt.hashpw(plainPass, BCrypt.gensalt(12))
     }
 
     fun matchPasswords(plainPass: String, hashPass: String): Boolean = BCrypt.checkpw(plainPass, hashPass)
 
-    private fun validatePasswordStrength(pass: String) {
+    private fun validatePasswordStrength(pass: String, validateConstraints: Boolean) {
 
-        if (USE_PASSWORD_CONSTRAINTS) {
+        if (validateConstraints) {
             val errors = mutableListOf<String>()
 
             if (pass.length < PASS_LENGTH) errors.add("Minimum length is $PASS_LENGTH symbols.")

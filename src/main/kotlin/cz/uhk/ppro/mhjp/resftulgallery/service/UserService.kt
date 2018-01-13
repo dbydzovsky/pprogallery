@@ -17,6 +17,6 @@ interface UserService : CrudService<NewUserDto, UpdateUserDto, String> {
 
     fun getUserRoles(username: String, authorization: String): ResponseEntity<ResponseDto>
 
-    fun updateUserRoles(username: String, authorization: String, roles: List<String>): ResponseEntity<ResponseDto>
+    fun updateUserRoles(username: String, authorization: String, rolesDto: RolesListDto): ResponseEntity<ResponseDto>
 
 }

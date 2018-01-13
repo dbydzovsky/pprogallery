@@ -26,24 +26,26 @@ class AuthenticationServiceImpl (
         val credentials = try {
             String(Base64.getDecoder().decode(credentialsB64))
         } catch (e: IllegalArgumentException) {
-            throw IncorrectAuthHeaderFormatException("Error during token generation. Authorization header is not valid Base64.")
+            throw IncorrectAuthHeaderFormatException("Error during authentication. Authorization header is not valid Base64.")
         }
 
         val (username, password) = try {
             credentials.split(":")
         } catch (e: IndexOutOfBoundsException) {
-            throw IncorrectAuthHeaderFormatException("Error during token generation. Authorization header has incorrect format.")
+            throw IncorrectAuthHeaderFormatException("Error during authentication. Authorization header has incorrect format.")
         }
 
         val user = userRepository.getOneByUsername(username)
-                ?: throw ContentNotFoundException("Error during token generation. User '$username' not found.")
+                ?: throw ContentNotFoundException("Error during authentication. User '$username' not found.")
 
         if (!passwordValidator.matchPasswords(password, user.password))
-            throw PasswordsDontMatchException("Error during token generation. Incorrect password")
+            throw PasswordsDontMatchException("Error during authentication. Incorrect password")
+
+        if (!user.enabled) throw ForbiddenContentException("Error during authentication. Your account is disabled.")
 
         val (token, expires) = jwtHandler.generateToken(username)
 
-        return responseBuilder.buildSuccessfulResponse(200, "Token successfully generated.", JwtDto(token, expires))
+        return responseBuilder.buildSuccessfulResponse(200, "Successfully authenticated.", JwtDto(token, expires))
 
     }
 

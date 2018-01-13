@@ -24,7 +24,7 @@ class ImageCommentServiceImpl(
     override fun createEntity(newType: SubmitCommentDto, authorization: String?, parent: String?): ResponseEntity<ResponseDto> {
         dtoValidator.validateDto(newType)
         val author = authorizationManager.authorize(
-                token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR", "ROLE_ADMIN")
+                token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR")
         )
         val image = imageRepository.getOneByUuid(parent!!)
                 ?: throw ContentNotFoundException("Error while commenting image. Image not found.")

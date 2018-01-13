@@ -1,6 +1,7 @@
 package cz.uhk.ppro.mhjp.resftulgallery.rest
 
 import cz.uhk.ppro.mhjp.resftulgallery.dto.NewUserDto
+import cz.uhk.ppro.mhjp.resftulgallery.dto.RolesListDto
 import cz.uhk.ppro.mhjp.resftulgallery.dto.UpdateUserDto
 import cz.uhk.ppro.mhjp.resftulgallery.dto.UpdateUserPasswordDto
 import cz.uhk.ppro.mhjp.resftulgallery.service.UserService
@@ -42,6 +43,10 @@ class UserController(
             = userService.enableUser(username, headerUtil.getTokenFromHeader(request))
 
     @GetMapping("/api/u/{username}/roles")
-    fun getUserRoles(@PathVariable username: String, request: HttpServletRequest)
+    fun getUserRoles(@PathVariable("username") username: String, request: HttpServletRequest)
             = userService.getUserRoles(username, headerUtil.getTokenFromHeader(request))
+
+    @PutMapping("/api/u/{username}/roles")
+    fun editUserRoles(@PathVariable("username") username: String, @RequestBody roles: RolesListDto, request: HttpServletRequest)
+            = userService.updateUserRoles(username, headerUtil.getTokenFromHeader(request), roles)
 }

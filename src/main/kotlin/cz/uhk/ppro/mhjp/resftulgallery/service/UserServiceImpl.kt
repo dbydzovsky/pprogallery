@@ -110,19 +110,19 @@ class UserServiceImpl(
     }
 
     override fun getUserRoles(username: String, authorization: String): ResponseEntity<ResponseDto> {
-        authorizationManager.authorize(authorization)
+        authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_MODERATOR"))
         val user = userRepository.getOneByUsername(username)
                 ?: throw ContentNotFoundException("Error while getting $username's roles. User '$username' not found.")
         val roles = dtoBuilder.getRolesDto(user.roles)
         return responseBuilder.buildSuccessfulResponse(200, "User '$username' roles successfully retrieved.", roles)
     }
 
-    override fun updateUserRoles(username: String, authorization: String, roles: List<String>): ResponseEntity<ResponseDto> {
+    override fun updateUserRoles(username: String, authorization: String, rolesDto: RolesListDto): ResponseEntity<ResponseDto> {
         authorizationManager.authorize(authorization)
         val user = userRepository.getOneByUsername(username)
                 ?: throw ContentNotFoundException("Error while changing $username's roles. User '$username' not found.")
-        val rolesToBeAdded = roles.mapNotNull { roleRepository.getOneByName(it) }
-        if (rolesToBeAdded.isEmpty()) throw NoContentException("Error while changing $username's roles. There are no roles.")
+        val rolesToBeAdded = rolesDto.roles.mapNotNull { roleRepository.getOneByName(it) }.distinct()
+        if (rolesToBeAdded.isEmpty()) throw NoContentException("Error while changing $username's roles. There are no rolesDto.")
         val updatedUser = user.copy(roles = rolesToBeAdded)
         userRepository.save(updatedUser)
         return responseBuilder.buildSuccessfulResponse(204, "User '$username' roles updated successfully.")
