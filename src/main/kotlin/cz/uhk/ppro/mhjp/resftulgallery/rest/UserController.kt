@@ -42,10 +42,6 @@ class UserController(
     fun enableUser(@PathVariable("username") username: String, request: HttpServletRequest)
             = userService.enableUser(username, headerUtil.getTokenFromHeader(request))
 
-    @PostMapping("/api/u/{username}/report")
-    fun reportUser(@PathVariable("username") username: String, @RequestBody report: SubmitReportDto, request: HttpServletRequest)
-            = userService.reportUser(username, report, headerUtil.getTokenFromHeader(request))
-
     @GetMapping("/api/u/{username}/roles")
     fun getUserRoles(@PathVariable username: String, request: HttpServletRequest)
             = userService.getUserRoles(username, headerUtil.getTokenFromHeader(request))
