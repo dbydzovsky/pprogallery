@@ -9,8 +9,6 @@ interface ImageService : CrudService<NewImageDto, UpdateImageDto, String> {
 
     fun deleteImageWithDeleteHash(uuid: String, deleteHash: String): ResponseEntity<ResponseDto>
 
-    fun reportImage(uuid: String, report: SubmitReportDto, authorization: String): ResponseEntity<ResponseDto>
-
     fun like(uuid: String, authorization: String): ResponseEntity<ResponseDto>
 
 }

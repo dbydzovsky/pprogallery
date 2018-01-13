@@ -7,8 +7,6 @@ interface UserService : CrudService<NewUserDto, UpdateUserDto, String> {
 
     fun changePassword(username: String, updateUserPasswordDto: UpdateUserPasswordDto, authorization: String): ResponseEntity<ResponseDto>
 
-    fun reportUser(username: String, report: SubmitReportDto, authorization: String): ResponseEntity<ResponseDto>
-
     //---------------------Moderator tools--------------------
 
     fun disableUser(username: String, authorization: String): ResponseEntity<ResponseDto>

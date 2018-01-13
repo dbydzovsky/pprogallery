@@ -94,15 +94,11 @@ class ImageServiceImpl(
     override fun deleteImageWithDeleteHash(uuid: String, deleteHash: String): ResponseEntity<ResponseDto> {
         val image = imageRepository.getOneByUuid(uuid)
                 ?: throw ContentNotFoundException("Error while deleting image description. Image not found.")
-        if (image.deleteHash == deleteHash) {
+        if (image.deleteHash == deleteHash && image.anonymous) {
             return deleteEntity(idType = uuid, authorize = false)
         } else {
             throw ForbiddenContentException("Forbidden. You don't have rights to do this action.")
         }
-    }
-
-    override fun reportImage(uuid: String, report: SubmitReportDto, authorization: String): ResponseEntity<ResponseDto> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun like(uuid: String, authorization: String): ResponseEntity<ResponseDto> {

@@ -88,15 +88,6 @@ class UserServiceImpl(
         return responseBuilder.buildSuccessfulResponse(204, "Successfully changed password of user '$username'.")
     }
 
-    override fun reportUser(username: String, report: SubmitReportDto, authorization: String): ResponseEntity<ResponseDto> {
-        val reportAuthor = authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR"))
-        val reportedUser = userRepository.getOneByUsername(username) ?:
-                throw ContentNotFoundException("Error while reporting user. User '$username' not found.")
-        dtoValidator.validateDto(report)
-        // todo implement
-        return responseBuilder.buildSuccessfulResponse(204, "Successfully reported user '$username' for '${report.reason}'.")
-    }
-
     override fun disableUser(username: String, authorization: String): ResponseEntity<ResponseDto> {
         authorizationManager.authorize(token = authorization, specifiedRoles = listOf("ROLE_MODERATOR"))
         val user = userRepository.getOneByUsername(username) ?:
