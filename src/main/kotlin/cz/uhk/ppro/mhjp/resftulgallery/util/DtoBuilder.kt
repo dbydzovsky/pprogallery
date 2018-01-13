@@ -1,9 +1,6 @@
 package cz.uhk.ppro.mhjp.resftulgallery.util
 
-import cz.uhk.ppro.mhjp.resftulgallery.domain.Image
-import cz.uhk.ppro.mhjp.resftulgallery.domain.ImageComment
-import cz.uhk.ppro.mhjp.resftulgallery.domain.Role
-import cz.uhk.ppro.mhjp.resftulgallery.domain.User
+import cz.uhk.ppro.mhjp.resftulgallery.domain.*
 import cz.uhk.ppro.mhjp.resftulgallery.dto.*
 import org.springframework.stereotype.Component
 
@@ -14,8 +11,7 @@ class DtoBuilder(
 
     // -------------User DTOs-------------
 
-    fun getUserDto(user: User): DataDto
-            = hateoasUtil.addSelfObjectLink(
+    fun getUserDto(user: User) = hateoasUtil.addSelfObjectLink(
             UserDataDto(
                     username = user.username,
                     name = user.name,
@@ -26,15 +22,11 @@ class DtoBuilder(
             )
     )
 
-    private fun getListUserDto(user: User): DataDto
-            = ListUserDataDto(
-            username = user.username
-    )
+    private fun getListUserDto(user: User) = ListUserDataDto(username = user.username)
 
     // -------------Image DTOs-------------
 
-    fun getImageDto(image: Image): DataDto
-            = hateoasUtil.addSelfObjectLink(
+    fun getImageDto(image: Image) = hateoasUtil.addSelfObjectLink(
             ImageDataDto(
                     uuid = image.uuid,
                     description = image.description,
@@ -47,8 +39,7 @@ class DtoBuilder(
 
     )
 
-    fun getAnonImageDto(image: Image): DataDto
-            = hateoasUtil.addSelfObjectLink(
+    fun getAnonImageDto(image: Image) = hateoasUtil.addSelfObjectLink(
             AnonImageDataDto(
                     uuid = image.uuid,
                     description = image.description,
@@ -59,8 +50,7 @@ class DtoBuilder(
 
     )
 
-    fun getNewImageDto(image: Image): DataDto
-            = hateoasUtil.addSelfObjectLink(
+    fun getNewImageDto(image: Image) = hateoasUtil.addSelfObjectLink(
             NewImageDataDto(
                     uuid = image.uuid,
                     description = image.description,
@@ -70,8 +60,7 @@ class DtoBuilder(
             )
     )
 
-    fun getNewAnonImageDto(image: Image): DataDto
-            = hateoasUtil.addSelfObjectLink(
+    fun getNewAnonImageDto(image: Image) = hateoasUtil.addSelfObjectLink(
             NewAnonImageDataDto(
                     uuid = image.uuid,
                     deleteHash = image.deleteHash,
@@ -80,15 +69,11 @@ class DtoBuilder(
             )
     )
 
-    private fun getListImageDto(image: Image): ListImageDataDto
-            = ListImageDataDto(
-            uuid = image.uuid
-    )
+    private fun getListImageDto(image: Image) = ListImageDataDto(uuid = image.uuid)
 
     // -------------Comment DTOs-------------
 
-    fun getCommentDto(comment: ImageComment)
-            = hateoasUtil.addSelfObjectLink(
+    fun getCommentDto(comment: ImageComment) = hateoasUtil.addSelfObjectLink(
             CommentDataDto(
                     uuid = comment.uuid,
                     author = hateoasUtil.addObjectLink(ListUserDataDto(comment.author.name), "author") as ListUserDataDto,
@@ -97,16 +82,24 @@ class DtoBuilder(
             )
     )
 
-    private fun getListCommentDto(comment: ImageComment): ListCommentDataDto
-            = ListCommentDataDto(
-            uuid = comment.uuid
+    private fun getListCommentDto(comment: ImageComment) = ListCommentDataDto(uuid = comment.uuid)
+
+    // -------------Gallery DTOs------------
+
+    fun getGalleryDto(gallery: Gallery) = hateoasUtil.addSelfObjectLink(
+            GalleryDataDto(
+                    uuid = gallery.uuid,
+                    title = gallery.title,
+                    private = gallery.private,
+                    images = hateoasUtil.addListItemsLinks(gallery.images.map { getListImageDto(it) }, "image"),
+                    author = hateoasUtil.addObjectLink(getListUserDto(gallery.author), "author") as ListUserDataDto
+            )
     )
+
+    private fun getListGalleryDto(gallery: Gallery) = ListGalleryDataDto(uuid = gallery.uuid)
 
     // -------------Role DTOs-------------
 
-    fun getRolesDto(roles: List<Role>)
-            = RolesListDto(
-            roles = roles.map { it.name }
-    )
+    fun getRolesDto(roles: List<Role>) = RolesListDto(roles = roles.map { it.name })
 
 }

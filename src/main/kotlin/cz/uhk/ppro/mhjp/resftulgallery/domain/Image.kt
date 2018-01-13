@@ -16,7 +16,9 @@ data class Image(
         @ManyToOne
         val author: User? = null,
         @OneToMany(mappedBy = "image")
-        val comments: List<ImageComment> = listOf(),
+        val comments: List<ImageComment> = emptyList(),
+        @ManyToMany(mappedBy = "images")
+        val galleries: List<Gallery> = emptyList(),
         @ManyToMany(mappedBy = "likedImages")
         val likedByUsers: List<User> = emptyList()
 )

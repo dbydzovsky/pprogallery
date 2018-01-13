@@ -11,7 +11,8 @@ data class User(
         val dateJoined: Long = System.currentTimeMillis(),
         val enabled: Boolean = true,
         val private: Boolean = false,
-        @ManyToMany @JoinTable(
+        @ManyToMany
+        @JoinTable(
                 name = "users_role",
                 joinColumns = [(JoinColumn(name = "user_username"))],
                 inverseJoinColumns = [(JoinColumn(name = "role_id"))]
@@ -21,10 +22,13 @@ data class User(
         val images: List<Image> = emptyList(),
         @OneToMany(mappedBy = "author")
         val imageComments: List<ImageComment> = emptyList(),
-        @ManyToMany @JoinTable(
+        @OneToMany(mappedBy = "author")
+        val galleries: List<Gallery> = emptyList(),
+        @ManyToMany
+        @JoinTable(
                 name = "liked_images",
                 joinColumns = [(JoinColumn(name = "user_username"))],
-                inverseJoinColumns = [(JoinColumn(name = "image_id"))]
+                inverseJoinColumns = [(JoinColumn(name = "image_uuid"))]
         )
         val likedImages: List<Image> = emptyList()
 )

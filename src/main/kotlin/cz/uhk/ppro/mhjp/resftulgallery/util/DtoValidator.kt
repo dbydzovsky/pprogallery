@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component
 @Component
 class DtoValidator {
 
+    companion object {
+        private const val MAX_IMG_SIZE = 10000000
+    }
+
     fun validateDto(dto: Any) {
 
         when (dto) {
@@ -14,6 +18,7 @@ class DtoValidator {
             is UpdateUserPasswordDto -> validateUpdatePassword(dto)
             is SubmitReportDto -> validateReport(dto)
             is NewImageDto -> validateNewImage(dto)
+            is SubmitCommentDto -> validateComment(dto)
             else -> throw UnknownDtoException("Error while processing DTO. Unknown DTO.")
         }
 
@@ -43,7 +48,12 @@ class DtoValidator {
         if (dto.imageBytes.isEmpty()) {
             throw IncompleteSubmittedDtoException("Error while uploading image. Image has no content.")
         }
-        if (dto.imageBytes.size > 10000000)
+        if (dto.imageBytes.size > MAX_IMG_SIZE)
             throw ImageSizeTooLargeException("Error while uploading image. Image is bigger than 10MB.")
+    }
+
+    private fun validateComment(dto: SubmitCommentDto) {
+        if (dto.content == "")
+            throw IncompleteSubmittedDtoException("Error while submitting comment. You have not specified all required parameters.")
     }
 }

@@ -1,13 +1,10 @@
 package cz.uhk.ppro.mhjp.resftulgallery.service
 
-import cz.uhk.ppro.mhjp.resftulgallery.dao.ImageCommentRepository
 import cz.uhk.ppro.mhjp.resftulgallery.dao.ImageRepository
 import cz.uhk.ppro.mhjp.resftulgallery.dao.UserRepository
 import cz.uhk.ppro.mhjp.resftulgallery.domain.Image
-import cz.uhk.ppro.mhjp.resftulgallery.domain.ImageComment
 import cz.uhk.ppro.mhjp.resftulgallery.dto.*
 import cz.uhk.ppro.mhjp.resftulgallery.security.AuthorizationManager
-import cz.uhk.ppro.mhjp.resftulgallery.security.JwtHandler
 import cz.uhk.ppro.mhjp.resftulgallery.util.*
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -27,7 +24,7 @@ class ImageServiceImpl(
         dtoValidator.validateDto(newType)
         val image = if (authorization == null) {
             Image(
-                    uuid = hashGenerator.hashIdToUuid(System.currentTimeMillis()),
+                    uuid = hashGenerator.hashImageIdToUuid(System.currentTimeMillis()),
                     deleteHash = hashGenerator.hashIdToDeleteHash(System.currentTimeMillis()),
                     description = newType.description,
                     imageBytes = newType.imageBytes,
@@ -36,10 +33,10 @@ class ImageServiceImpl(
             )
         } else {
             val author = authorizationManager.authorize(
-                    token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR", "ROLE_ADMIN")
+                    token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR")
             )
             Image(
-                    uuid = hashGenerator.hashIdToUuid(System.currentTimeMillis()),
+                    uuid = hashGenerator.hashImageIdToUuid(System.currentTimeMillis()),
                     deleteHash = hashGenerator.hashIdToDeleteHash(System.currentTimeMillis()),
                     description = newType.description,
                     imageBytes = newType.imageBytes,
@@ -110,7 +107,7 @@ class ImageServiceImpl(
 
     override fun like(uuid: String, authorization: String): ResponseEntity<ResponseDto> {
         val user = authorizationManager.authorize(
-                token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR", "ROLE_ADMIN")
+                token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR")
         )
         val image = imageRepository.getOneByUuid(uuid)
                 ?: throw ContentNotFoundException("Error while liking image. Image not found.")

@@ -17,10 +17,12 @@ class ImageCommentServiceImpl(
         private val authorizationManager: AuthorizationManager,
         private val hashGenerator: HashGenerator,
         private val dtoBuilder: DtoBuilder,
-        private val responseBuilder: ResponseBuilder
+        private val responseBuilder: ResponseBuilder,
+        private val dtoValidator: DtoValidator
 ) : ImageCommentService {
 
     override fun createEntity(newType: SubmitCommentDto, authorization: String?, parent: String?): ResponseEntity<ResponseDto> {
+        dtoValidator.validateDto(newType)
         val author = authorizationManager.authorize(
                 token = authorization, specifiedRoles = listOf("ROLE_USER", "ROLE_MODERATOR", "ROLE_ADMIN")
         )
@@ -28,7 +30,7 @@ class ImageCommentServiceImpl(
                 ?: throw ContentNotFoundException("Error while commenting image. Image not found.")
         if (image.private) throw CommentOfPrivateImage("Error while commenting image. You can not comment private image")
         val newComment = ImageComment(
-                uuid = hashGenerator.hashIdToUuid(System.currentTimeMillis()),
+                uuid = hashGenerator.hashCommentIdToUuid(System.currentTimeMillis()),
                 content = newType.content,
                 image = image,
                 author = author
@@ -51,6 +53,7 @@ class ImageCommentServiceImpl(
     }
 
     override fun updateEntity(idType: String, updateType: SubmitCommentDto, authorization: String?, authorize: Boolean): ResponseEntity<ResponseDto> {
+        dtoValidator.validateDto(idType)
         val commentToBeEdited = imageCommentRepository.getOneByUuid(idType)
                 ?: throw ContentNotFoundException("Error while editing comment. Comment not found.")
         authorizationManager.authorize(authorization, commentToBeEdited.author.name)
