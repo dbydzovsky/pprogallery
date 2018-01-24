@@ -3,7 +3,7 @@
 export function request<TResponse, TErrorResponse>(requestConfig: IRequestConfig<TResponse, TErrorResponse>) {
     const req = new XMLHttpRequest();
     const url = requestConfig.url;
-    const async = false;
+    const async = true;
     req.open(requestConfig.method, url, async);
     setHeaders(req, requestConfig.headers);
 
@@ -26,6 +26,7 @@ export enum MediaType {
 
 export interface IRequestOptions {
     doNotTransformMessage?: boolean;
+    headers: IHeader[];
 }
 
 export interface IRequestConfig<TResponse, TErrorResponse> {

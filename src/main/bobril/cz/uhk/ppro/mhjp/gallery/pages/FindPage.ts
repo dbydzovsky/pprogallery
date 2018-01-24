@@ -1,5 +1,5 @@
 import * as b from 'bobril'
-import * as bs from 'bobrilstrap'
+import * as bs from '../node_modules/bobrilstrap/index';
 
 export interface IData {
 }

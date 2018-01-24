@@ -2,7 +2,7 @@
   "name": "galery",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,5 +11,10 @@
   "dependencies": {
     "bobril": "^8.2.1",
     "bobrilstrap": "^2.1.0"
+  },
+  "bobril": {
+    "title": "Gallery",
+    "head": "<link rel=\"shortcut icon\" href=\"favicon.ico\" type=\"image/x-icon\" />",
+    "additionalResourcesDirectory": "assets/"
   }
 }

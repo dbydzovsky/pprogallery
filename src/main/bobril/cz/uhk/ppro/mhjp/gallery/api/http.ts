@@ -3,6 +3,73 @@ import { MediaType, IHeader, IRequestOptions, request } from './api';
 // todo adjust base URL
 const baseUrl: string = '/rest/web/';
 
+export function httpDelete<TData, TResponse, TErrorResponse>(
+    endpoint: string,
+    data?: TData,
+    success?: (response: TResponse, status: number, headers: (key: string) => string) => void,
+    error?: (response: TResponse, status: number) => void,
+    options?: IRequestOptions
+) {
+    request<TResponse, TErrorResponse>({
+        method: 'DELETE',
+        url: urlBuilder(endpoint),
+        data: JSON.stringify(data),
+        errorCallback: error,
+        successCallback: success,
+        headers: [
+            getAcceptHeader(options),
+            getContentTypeHeader(options),
+            getCsrfTokenHeader(),
+            ...options.headers
+        ],
+        options: options
+    });
+}
+
+export function httpPut<TData, TResponse, TErrorResponse>(
+    endpoint: string,
+    data?: TData,
+    success?: (response: TResponse, status: number, headers: (key: string) => string) => void,
+    error?: (response: TResponse, status: number) => void,
+    options?: IRequestOptions
+) {
+    request<TResponse, TErrorResponse>({
+        method: 'PUT',
+        url: urlBuilder(endpoint),
+        data: JSON.stringify(data),
+        errorCallback: error,
+        successCallback: success,
+        headers: [
+            getAcceptHeader(options),
+            getContentTypeHeader(options),
+            getCsrfTokenHeader(),
+            ...options.headers
+        ],
+        options: options
+    });
+}
+export function httpGet<TData, TResponse, TErrorResponse>(
+    endpoint: string,
+    data?: TData,
+    success?: (response: TResponse, status: number, headers: (key: string) => string) => void,
+    error?: (response: TResponse, status: number) => void,
+    options?: IRequestOptions
+) {
+    request<TResponse, TErrorResponse>({
+        method: 'GET',
+        url: urlBuilder(endpoint),
+        data: JSON.stringify(data),
+        errorCallback: error,
+        successCallback: success,
+        headers: [
+            getAcceptHeader(options),
+            getContentTypeHeader(options),
+            getCsrfTokenHeader(),
+            ...options.headers
+        ],
+        options: options
+    });
+}
 export function httpPost<TData, TResponse, TErrorResponse>(
     endpoint: string,
     data?: TData,
@@ -19,7 +86,8 @@ export function httpPost<TData, TResponse, TErrorResponse>(
         headers: [
             getAcceptHeader(options),
             getContentTypeHeader(options),
-            getCsrfTokenHeader()
+            getCsrfTokenHeader(),
+            ...options.headers
         ],
         options: options
     });

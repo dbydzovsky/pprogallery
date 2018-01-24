@@ -16,9 +16,9 @@
         "noLib": false,
         "preserveConstEnums": false,
         "experimentalDecorators": true,
-        "types": [],
         "jsx": "react",
-        "reactNamespace": "b"
+        "reactNamespace": "b",
+        "types": []
     },
     "include": [
         "**/*"
